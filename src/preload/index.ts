@@ -1,8 +1,17 @@
-import { contextBridge } from 'electron';
-import { electronAPI } from '@electron-toolkit/preload';
+import { contextBridge, ipcRenderer } from 'electron';
+import { electronAPI, ElectronAPI } from '@electron-toolkit/preload';
+import { Game, LauncherPaths } from '@shared/types';
 
 // Custom APIs for renderer
-const api = {};
+export const api = {
+  dialog: {
+    openDirPicker: (): Promise<string> => ipcRenderer.invoke('dialog:open-dir'),
+  },
+  scanner: {
+    paths: (): Promise<LauncherPaths> => ipcRenderer.invoke('games:paths'),
+    games: (paths: LauncherPaths): Promise<Game[]> => ipcRenderer.invoke('games:all', paths),
+  },
+};
 
 // Use `contextBridge` APIs to expose Electron APIs to
 // renderer only if context isolation is enabled, otherwise

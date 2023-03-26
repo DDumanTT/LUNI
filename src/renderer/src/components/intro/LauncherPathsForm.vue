@@ -8,11 +8,14 @@
         :id="key"
         :key="key"
         class="cursor-pointer"
-        read-only
+        readonly
         clearable
+        required
         :label="launcherNamesMap[key]"
         :value="launcherPaths[key]"
         :icon="launcherIconsMap[key]"
+        @click="handlePathChange(key)"
+        @clear="handlePathClear(key)"
       />
     </div>
   </template>
@@ -20,7 +23,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import {
   IconSteam,
   IconEpicgames,
@@ -45,6 +48,28 @@ const launcherNamesMap: Record<string, string> = {
 };
 
 const loading = ref(false);
+
+onMounted(() => {
+  getLauncherPaths();
+});
+
+const handlePathChange = async (key: string) => {
+  const path = await window.api.dialog.openDirPicker();
+  if (!path) return;
+  launcherPaths.value[key] = path;
+};
+
+const handlePathClear = (key: string) => {
+  launcherPaths.value[key] = '';
+};
+
+const getLauncherPaths = async () => {
+  const newPaths = await window.api.scanner.paths();
+  Object.keys(launcherPaths.value).forEach((key) => {
+    if (launcherPaths.value[key] === '' && newPaths[key]) launcherPaths.value[key] = newPaths[key];
+  });
+  loading.value = false;
+};
 </script>
 
 <style lang=""></style>

@@ -1,15 +1,10 @@
 import { useLocalStorage } from '@vueuse/core';
 import { defineStore } from 'pinia';
 
+import { LauncherPaths } from '@shared/types';
+
 export const firstStart = useLocalStorage('firstStart', true);
 
-export type LauncherPaths = {
-  [key: string]: string;
-  steam: string;
-  epic: string;
-  ea: string;
-  ubisoft: string;
-};
 const initialLauncherPaths: LauncherPaths = {
   steam: '',
   epic: '',

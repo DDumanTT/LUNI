@@ -1,6 +1,7 @@
-import { app, shell, BrowserWindow, Menu } from 'electron';
+import { app, shell, BrowserWindow, Menu, ipcMain, IpcMainInvokeEvent } from 'electron';
 import { join } from 'path';
 import { electronApp, optimizer, is } from '@electron-toolkit/utils';
+
 import icon from '../../resources/icon.png?asset';
 
 function createWindow(): void {
@@ -75,3 +76,17 @@ app.on('window-all-closed', () => {
 
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.
+
+import { GameScanner } from './scanner/GameScanner';
+import { LauncherPaths } from '@shared/types';
+
+const gameScanner = new GameScanner();
+ipcMain.handle('games:paths', gameScanner.getPaths);
+ipcMain.handle('games:all', async (_: IpcMainInvokeEvent, paths: LauncherPaths) => {
+  gameScanner.setPaths(paths);
+  return await gameScanner.scan();
+});
+
+import { openDirPicker } from './dialog';
+
+ipcMain.handle('dialog:open-dir', openDirPicker);
