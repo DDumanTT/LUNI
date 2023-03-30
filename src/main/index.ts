@@ -1,6 +1,6 @@
-import { app, shell, BrowserWindow, Menu, ipcMain, IpcMainInvokeEvent } from 'electron';
+import { app, shell, BrowserWindow, Menu, ipcMain, IpcMainInvokeEvent, session } from 'electron';
 import { join } from 'path';
-import { electronApp, optimizer, is } from '@electron-toolkit/utils';
+import { electronApp, optimizer, is, devTools } from '@electron-toolkit/utils';
 
 import icon from '../../resources/icon.png?asset';
 
@@ -53,6 +53,8 @@ app.whenReady().then(() => {
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window);
   });
+
+  devTools.install('VUEJS3_DEVTOOLS', { allowFileAccess: true });
 
   optimizer.registerFramelessWindowIpc();
 

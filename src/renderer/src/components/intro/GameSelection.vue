@@ -29,6 +29,10 @@
 </template>
 
 <script lang="ts">
+interface GameSelectProps {
+  games: GameListItem[];
+  paths: LauncherPaths;
+}
 interface GameListItem extends Game {
   selected?: boolean;
 }
@@ -43,8 +47,10 @@ import {
   IconUbisoft,
 } from '@iconify-prerendered/vue-simple-icons';
 
-import { launcherPaths } from '@renderer/store';
-import { Game } from '@shared/types';
+import { Game, LauncherPaths } from '@shared/types';
+
+const props = defineProps<GameSelectProps>();
+const emit = defineEmits(['update:games', 'update:toggle']);
 
 const launcherIconsMap: Record<string, SvgComponent> = {
   steam: IconSteam,
@@ -54,21 +60,20 @@ const launcherIconsMap: Record<string, SvgComponent> = {
 };
 
 const loading = ref(true);
-const games = ref<GameListItem[]>([]);
 
 onMounted(() => {
   getGames();
 });
 
 const getGames = async () => {
-  const res: GameListItem[] = await window.api.scanner.games(toRaw(launcherPaths.value));
+  const res: GameListItem[] = await window.api.scanner.games(toRaw(props.paths));
   res.forEach((game) => (game.selected = true));
-  games.value = res;
+  emit('update:games', res);
   loading.value = false;
 };
 
 const handleToggle = (game: GameListItem) => {
-  game.selected = !game.selected;
+  emit('update:toggle', game);
 };
 </script>
 

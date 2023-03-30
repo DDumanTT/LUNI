@@ -1,10 +1,10 @@
 <template>
   <h1 class="mb-8 text-4xl font-bold text-primary-11">Launcher paths</h1>
-  <template v-if="!loading">
-    <h2 class="mb-4 font-bold">Select game launcher directories.</h2>
+  <h2 class="mb-4 font-bold">Select game launcher directories.</h2>
+  <div v-if="!loading" class="h-full overflow-auto">
     <div class="flex flex-col gap-4">
       <Input
-        v-for="key in Object.keys(launcherPaths)"
+        v-for="key in Object.keys(props.paths.value)"
         :id="key"
         :key="key"
         class="cursor-pointer"
@@ -12,15 +12,21 @@
         clearable
         required
         :label="launcherNamesMap[key]"
-        :value="launcherPaths[key]"
+        :value="props.paths.value[key]"
         :icon="launcherIconsMap[key]"
         @click="handlePathChange(key)"
         @clear="handlePathClear(key)"
       />
     </div>
-  </template>
+  </div>
   <template v-else>Loading...</template>
 </template>
+
+<script lang="ts">
+interface PathsFormProps {
+  paths: LauncherPaths;
+}
+</script>
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
@@ -31,8 +37,11 @@ import {
   IconUbisoft,
 } from '@iconify-prerendered/vue-simple-icons';
 
-import { launcherPaths } from '@renderer/store';
 import Input from '../Input.vue';
+import { LauncherPaths } from '@shared/types';
+
+const props = defineProps<PathsFormProps>();
+const emit = defineEmits(['update']);
 
 const launcherIconsMap: Record<string, SvgComponent> = {
   steam: IconSteam,
@@ -56,17 +65,17 @@ onMounted(() => {
 const handlePathChange = async (key: string) => {
   const path = await window.api.dialog.openDirPicker();
   if (!path) return;
-  launcherPaths.value[key] = path;
+  emit('update', key, path);
 };
 
 const handlePathClear = (key: string) => {
-  launcherPaths.value[key] = '';
+  emit('update', key, '');
 };
 
 const getLauncherPaths = async () => {
   const newPaths = await window.api.scanner.paths();
-  Object.keys(launcherPaths.value).forEach((key) => {
-    if (launcherPaths.value[key] === '' && newPaths[key]) launcherPaths.value[key] = newPaths[key];
+  Object.keys(props.paths.value).forEach((key) => {
+    if (props.paths.value[key] === '' && newPaths[key]) emit('update', key, newPaths[key]);
   });
   loading.value = false;
 };

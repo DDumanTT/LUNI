@@ -7,8 +7,6 @@
 </template>
 
 <script setup lang="ts">
-import './assets/css/styles.css';
-
 import { useLocalStorage } from '@vueuse/core';
 
 import TitleBar from './components/TitleBar.vue';

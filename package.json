@@ -29,11 +29,16 @@
     "@iconify-prerendered/vue-pixelarticons": "^0.22.1661146831",
     "@iconify-prerendered/vue-simple-icons": "^0.22.1679296367",
     "@vueuse/core": "^9.13.0",
+    "atropos": "^1.0.2",
     "dexie": "^3.2.3",
     "electron-updater": "^5.3.0",
+    "firebase": "^9.18.0",
     "pinia": "^2.0.33",
     "registry-js": "^1.15.1",
-    "vue-router": "4"
+    "rxjs": "^7.8.0",
+    "swiper": "^9.1.1",
+    "vue-router": "4",
+    "vuefire": "^3.1.0"
   },
   "devDependencies": {
     "@electron-toolkit/tsconfig": "^1.0.1",

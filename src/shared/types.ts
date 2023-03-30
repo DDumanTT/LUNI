@@ -7,8 +7,8 @@ export type LauncherPaths = {
 };
 
 export interface Game {
-  launcher: string;
   id: string;
+  launcher: string;
   name: string;
   path: string;
 }
