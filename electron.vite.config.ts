@@ -27,5 +27,10 @@ export default defineConfig({
       },
     },
     plugins: [vue()],
+    build: {
+      rollupOptions: {
+        external: ['/src/renderer/src/firebase/functions/**/*'],
+      },
+    },
   },
 });

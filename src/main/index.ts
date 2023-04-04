@@ -1,5 +1,6 @@
-import { app, shell, BrowserWindow, Menu, ipcMain, IpcMainInvokeEvent, session } from 'electron';
+import { app, shell, BrowserWindow, Menu, ipcMain, IpcMainInvokeEvent, protocol } from 'electron';
 import { join } from 'path';
+import { fileURLToPath } from 'url';
 import { electronApp, optimizer, is, devTools } from '@electron-toolkit/utils';
 
 import icon from '../../resources/icon.png?asset';
@@ -44,6 +45,13 @@ Menu.setApplicationMenu(null);
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
+  // Register appdata:// protocol for serving
+  // local files from the appdata folder
+  protocol.registerFileProtocol('appdata', (request, callback) => {
+    const filePath = fileURLToPath('file://' + request.url.slice('appdata://'.length));
+    callback(filePath);
+  });
+
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron');
 
@@ -54,7 +62,7 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window);
   });
 
-  devTools.install('VUEJS3_DEVTOOLS', { allowFileAccess: true });
+  // devTools.install('VUEJS3_DEVTOOLS', { allowFileAccess: true });
 
   optimizer.registerFramelessWindowIpc();
 

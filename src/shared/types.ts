@@ -11,4 +11,8 @@ export interface Game {
   launcher: string;
   name: string;
   path: string;
+  icon?: string;
+  logo?: string;
+  cover?: string;
+  hero?: string;
 }
