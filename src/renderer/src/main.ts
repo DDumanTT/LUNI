@@ -1,5 +1,8 @@
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
+import 'swiper/css';
+import 'swiper/css/scrollbar';
+import 'atropos/css';
 
 import App from './App.vue';
 import router from './routes/router';

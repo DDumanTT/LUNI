@@ -113,20 +113,17 @@ export default class Steam implements Directory<Game> {
     const coverRe = /(.+)_library_600x900\.(jpg|png)/g;
     const logoRe = /(.+)_logo\.(jpg|png)/g;
     if (!this.images) this.images = await this.readImages();
-    // TODO: async foreach is incorrect, function returns before foreach completes
-    // refactor to Promise.all()
-    const promises = [];
-    this.images.every(async (image) => {
-      if (game.cover && game.hero && game.logo) return false;
-      if (image.startsWith(game.id)) {
-        console.log(game);
-        if (heroRe.test(image)) game.hero = await this.copyImage(image);
-        else if (coverRe.test(image)) game.cover = await this.copyImage(image);
-        else if (logoRe.test(image)) game.logo = await this.copyImage(image);
-        else if (iconRe.test(image)) game.icon = await this.copyImage(image);
-      }
-      return true;
-    });
+    await Promise.all(
+      this.images.map(async (image) => {
+        if (game.cover && game.hero && game.logo) return;
+        if (image.startsWith(game.id)) {
+          if (heroRe.test(image)) game.hero = await this.copyImage(image);
+          else if (coverRe.test(image)) game.cover = await this.copyImage(image);
+          else if (logoRe.test(image)) game.logo = await this.copyImage(image);
+          else if (iconRe.test(image)) game.icon = await this.copyImage(image);
+        }
+      })
+    );
     return game;
   }
 }

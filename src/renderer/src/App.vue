@@ -1,6 +1,6 @@
 <template>
   <TitleBar />
-  <div class="overflow-overlay flex-1">
+  <div class="overflow-y-overlay flex-1 overflow-x-hidden">
     <FirstStartPage v-if="firstStart" />
     <router-view v-else />
   </div>

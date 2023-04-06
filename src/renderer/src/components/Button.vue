@@ -1,7 +1,7 @@
 <template>
   <button
     :class="[
-      'shadow-md rounded-md px-4 py-2',
+      'rounded-md px-4 py-2 shadow-md',
       textColors[props.color],
       { [`border-2 ${borderColors[props.color]}`]: props.outline },
       { [importantBgColors[props.color]]: !props.outline && props.important },
@@ -14,7 +14,7 @@
 
 <script lang="ts">
 interface ButtonProps {
-  color: ComponentColors;
+  color?: ComponentColors;
   important?: boolean;
   outline?: boolean;
 }

@@ -1,6 +1,6 @@
 <template>
   <nav
-    className="sticky top-0 flex h-16 items-center border-b border-solid border-slate-700 bg-slate-800/30 px-4 backdrop-blur"
+    className="z-10 sticky top-0 flex h-16 items-center border-b border-solid border-primary-3 bg-blackA-9 px-4 backdrop-blur"
   >
     <div className="flex-1">search</div>
     <div className="h-full">
