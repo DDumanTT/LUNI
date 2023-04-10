@@ -32,7 +32,6 @@
     "@zag-js/menu": "^0.4.0",
     "@zag-js/vue": "^0.2.12",
     "atropos": "^1.0.2",
-    "dexie": "^3.2.3",
     "electron-updater": "^5.3.0",
     "firebase": "^9.18.0",
     "pinia": "^2.0.33",

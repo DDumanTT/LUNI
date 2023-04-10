@@ -40,8 +40,10 @@ import GameSelection from '@renderer/components/intro/GameSelection.vue';
 import LauncherPathsForm from '@renderer/components/intro/LauncherPathsForm.vue';
 import Splash from '@renderer/components/intro/Splash.vue';
 import Button from '@renderer/components/Button.vue';
-import { games, launcherPaths } from '@renderer/store';
+import { useGamesStore, launcherPaths } from '@renderer/store';
 import { Game } from '@shared/types';
+
+const gamesStore = useGamesStore();
 
 const gamesList = ref<GameListItem[]>([]);
 
@@ -76,7 +78,7 @@ const step = ref(0);
 const firstStart = useLocalStorage('firstStart', true);
 
 const handleFinish = async () => {
-  games.value = gamesList.value
+  gamesStore.games = gamesList.value
     .filter((game) => game.selected)
     .map(({ selected, ...rest }) => rest);
   firstStart.value = false;
