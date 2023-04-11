@@ -1,6 +1,11 @@
 <template>
-  <ContextMenu>
-    <Atropos inner-class="rounded-3xl" :active-offset="100" @click="handleClickGame(game)">
+  <GameMenu v-slot="apiProps" :game="game">
+    <Atropos
+      v-bind="apiProps"
+      inner-class="rounded-3xl"
+      :active-offset="100"
+      @click="handleClickGame(game)"
+    >
       <div class="relative flex h-[16vh] select-none items-center justify-center">
         <img
           v-if="game.hero"
@@ -23,7 +28,7 @@
         >
       </div>
     </Atropos>
-  </ContextMenu>
+  </GameMenu>
 </template>
 
 <script lang="ts">
@@ -37,6 +42,7 @@ import Atropos from 'atropos/vue';
 
 import { useGamesStore } from '@renderer/store';
 import { Game } from '@shared/types';
+import GameMenu from './GameMenu.vue';
 
 const props = defineProps<GameCardProps>();
 const emit = defineEmits(['click']);

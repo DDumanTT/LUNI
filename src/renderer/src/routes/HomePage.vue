@@ -30,7 +30,7 @@
         <h2 class="my-4 text-2xl font-bold">FAVORITES</h2>
         <hr class="flex-1 border-t-2 border-neutral-6" />
       </div>
-      <Swiper
+      <div
         class="overflow-visible"
         :slides-per-view="2"
         :space-between="32"
@@ -42,12 +42,12 @@
         :modules="[Scrollbar]"
       >
         <template v-if="gamesStore.favoriteGames.length !== 0">
-          <SwiperSlide v-for="game in gamesStore.favoriteGames" :key="game.id">
+          <div v-for="game in gamesStore.favoriteGames" :key="game.id">
             <GameCard :game="game" />
-          </SwiperSlide>
+          </div>
         </template>
         <div v-else>No favorite games</div>
-      </Swiper>
+      </div>
     </section>
   </div>
   <div v-else class="flex h-full w-full flex-col items-center justify-center gap-4">

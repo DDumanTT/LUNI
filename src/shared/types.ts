@@ -11,6 +11,7 @@ export interface Game {
   launcher: string;
   name: string;
   path: string;
+  isFavorite: boolean;
   icon?: string;
   logo?: string;
   cover?: string;

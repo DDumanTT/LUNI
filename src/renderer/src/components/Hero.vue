@@ -28,9 +28,9 @@
       >
         PLAY
       </Button>
-      <DropdownMenu v-slot="apiProps" class="inline">
-        <Button v-bind="apiProps" class="rounded-l-none px-0" color="success" important>▾</Button>
-      </DropdownMenu>
+      <GameMenu v-slot="apiProps" :game="game" dropdown class="inline">
+        <Button v-bind="apiProps" class="rounded-l-none !px-0" color="success" important>▾</Button>
+      </GameMenu>
     </div>
   </div>
 </template>
@@ -45,7 +45,7 @@ interface HeroProps {
 import { Game } from '@shared/types';
 import { useGamesStore } from '@renderer/store';
 import Button from './Button.vue';
-import DropdownMenu from './DropdownMenu.vue';
+import GameMenu from './GameMenu.vue';
 
 const props = defineProps<HeroProps>();
 
