@@ -1,7 +1,10 @@
 <template>
   <div>
-    <slot v-bind="dropdown ? api.triggerProps : api.contextTriggerProps" />
-    <div v-bind="api.positionerProps">
+    <slot
+      v-bind="Object.assign(api.triggerProps, dropdown ? {} : { onPointerdown: handleClose })"
+      @click.right="handleOpen"
+    />
+    <div v-bind="api.positionerProps" class="!fixed z-50">
       <ul v-bind="api.contentProps" class="min-w-[8rem] rounded bg-primary-4 p-1 text-base">
         <li
           v-for="item in items"
@@ -20,6 +23,7 @@
 export interface MenuItems extends ItemProps {
   label: string;
   icon?: SvgComponent;
+  click?: () => void;
 }
 
 interface ContextMenuProps {
@@ -30,36 +34,32 @@ interface ContextMenuProps {
 </script>
 
 <script lang="ts" setup>
-import { computed, watch } from 'vue';
+import { computed } from 'vue';
 import { normalizeProps, useMachine } from '@zag-js/vue';
 import * as menu from '@zag-js/menu';
 import { ItemProps } from '@zag-js/menu/dist/menu.types';
-import { useMouse } from '@vueuse/core';
 
 const props = withDefaults(defineProps<ContextMenuProps>(), { dropdown: false });
-const mouse = useMouse();
 
 const [state, send] = useMachine(
   menu.machine({
     id: props.id,
+    positioning: { placement: 'bottom' },
+    onSelect: (value) => {
+      props.items.find((item) => item.id === value.value)?.click?.();
+    },
   })
 );
-const api = computed(() => menu.connect(state.value, send, normalizeProps));
-// watch(
-//   () => api.value.isOpen,
-//   (isOpen) => {
-//     if (!isOpen) return;
-//     console.log(state.value);
-//     // api.value.positionerProps.style.position = 'fixed';
-//     console.log(`translate3d(${mouse.x.value}px, ${mouse.y.value}px, 0px)`);
-//   }
-// );
 
-// watch(api.value.isOpen, (isOpen) => {
-//   console.log('first');
-//   if (!isOpen) return;
-//   api.value.positionerProps.style.transform = `translate3d(${mouse.x}px, ${mouse.y}px, 0px)`;
-// });
+const api = computed(() => menu.connect(state.value, send, normalizeProps));
+const handleOpen = () => {
+  if (props.dropdown) return;
+  if (api.value.isOpen) return handleClose();
+  api.value.open();
+};
+const handleClose = () => {
+  api.value.close();
+};
 </script>
 
 <style lang="scss" scoped></style>

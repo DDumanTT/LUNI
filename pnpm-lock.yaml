@@ -35,6 +35,8 @@ specifiers:
   postcss-import: ^15.1.0
   prettier: ^2.8.4
   prettier-plugin-tailwindcss: ^0.2.5
+  primeicons: ^6.0.1
+  primevue: ^3.26.1
   registry-js: ^1.15.1
   rxjs: ^7.8.0
   swiper: ^9.1.1
@@ -60,6 +62,8 @@ dependencies:
   electron-updater: 5.3.0
   firebase: 9.19.1
   pinia: 2.0.33_hmuptsblhheur2tugfgucj7gc4
+  primeicons: 6.0.1
+  primevue: 3.26.1_lksi2hrxe57qe2yasjpvmju34y
   registry-js: 1.15.1
   rxjs: 7.8.0
   swiper: 9.1.1
@@ -1921,7 +1925,7 @@ packages:
   /@vueuse/shared/9.13.0_vue@3.2.47:
     resolution: {integrity: sha512-UrnhU+Cnufu4S6JLCPZnkWh0WwZGUp72ktOF2DFptMlOs3TOdVv8xJN53zhHGARmVOsz5KqOls09+J1NR6sBKw==}
     dependencies:
-      vue-demi: 0.13.11_vue@3.2.47
+      vue-demi: 0.14.0_vue@3.2.47
     transitivePeerDependencies:
       - '@vue/composition-api'
       - vue
@@ -4409,6 +4413,20 @@ packages:
     hasBin: true
     dev: true
 
+  /primeicons/6.0.1:
+    resolution: {integrity: sha512-KDeO94CbWI4pKsPnYpA1FPjo79EsY9I+M8ywoPBSf9XMXoe/0crjbUK7jcQEDHuc0ZMRIZsxH3TYLv4TUtHmAA==}
+    dev: false
+
+  /primevue/3.26.1_lksi2hrxe57qe2yasjpvmju34y:
+    resolution: {integrity: sha512-I10mYyKMl0GF0KfIZK+psCpifzE6vTW8lvlgB8ukmYghKUmU1Ii879OgD7a8xWM8ijoEaO4mYZ18XXVpQ3xScw==}
+    peerDependencies:
+      primeicons: ^5.0.0 || ^6.0.0
+      vue: ^3.0.0
+    dependencies:
+      primeicons: 6.0.1
+      vue: 3.2.47
+    dev: false
+
   /process-nextick-args/2.0.1:
     resolution: {integrity: sha512-3ouUOpQhtgrbOa17J7+uxOTpITYWaGP7/AhoR3+A+/1e9skrzelGi/dXzEYyvbxubEF6Wn2ypscTKiKJFFn1ag==}
     dev: false
@@ -5099,6 +5117,21 @@ packages:
       vue: 3.2.47
     dev: false
 
+  /vue-demi/0.14.0_vue@3.2.47:
+    resolution: {integrity: sha512-gt58r2ogsNQeVoQ3EhoUAvUsH9xviydl0dWJj7dabBC/2L4uBId7ujtCwDRD0JhkGsV1i0CtfLAeyYKBht9oWg==}
+    engines: {node: '>=12'}
+    hasBin: true
+    requiresBuild: true
+    peerDependencies:
+      '@vue/composition-api': ^1.0.0-rc.1
+      vue: ^3.0.0-0 || ^2.6.0
+    peerDependenciesMeta:
+      '@vue/composition-api':
+        optional: true
+    dependencies:
+      vue: 3.2.47
+    dev: false
+
   /vue-eslint-parser/9.1.0_eslint@8.36.0:
     resolution: {integrity: sha512-NGn/iQy8/Wb7RrRa4aRkokyCZfOUWk19OP5HP6JEozQFX5AoS/t+Z0ZN7FY4LlmWc4FNI922V7cvX28zctN8dQ==}
     engines: {node: ^14.17.0 || >=16.0.0}
@@ -5167,7 +5200,7 @@ packages:
     dependencies:
       firebase: 9.19.1
       vue: 3.2.47
-      vue-demi: 0.13.11_vue@3.2.47
+      vue-demi: 0.14.0_vue@3.2.47
     dev: false
 
   /webidl-conversions/3.0.1:

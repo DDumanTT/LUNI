@@ -12,6 +12,7 @@ export interface Game {
   name: string;
   path: string;
   isFavorite: boolean;
+  executable?: string;
   icon?: string;
   logo?: string;
   cover?: string;

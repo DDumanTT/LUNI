@@ -67,6 +67,7 @@ export default class Steam implements Directory<Game> {
       launcher: 'steam',
       id: '',
       name: '',
+      isFavorite: false,
       path: join(this.path, 'steamapps', 'common'),
     };
     matches.forEach((match) => {

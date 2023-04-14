@@ -22,15 +22,19 @@ import {
   IconContact,
   IconEditBox,
 } from '@iconify-prerendered/vue-pixelarticons';
+import { useGamesStore } from '@renderer/store';
+
+const store = useGamesStore();
 
 const props = withDefaults(defineProps<GameMenuProps>(), { dropdown: false });
 
 const items = reactive<MenuItems[]>([
-  { id: 'play-item', label: 'Play', icon: IconPlay },
+  { id: 'play-item', label: 'Play', icon: IconPlay, click: () => console.log(props.game.name) },
   {
     id: 'fav-item',
     label: props.game.isFavorite ? 'Unfavorite' : 'Favorite',
-    icon: props.game.isFavorite ? IconHeart : IconClose,
+    icon: props.game.isFavorite ? IconClose : IconHeart,
+    click: () => store.toggleFavorite(props.game.id),
   },
   {
     id: 'info-item',

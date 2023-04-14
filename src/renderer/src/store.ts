@@ -50,16 +50,20 @@ export const useGamesStore = defineStore('games', () => {
    * Toggles favorite game status
    * @param gameId ID of a game to mark/unmark favorite
    */
-  function markFavorite(gameId: string) {
+  function toggleFavorite(gameId: string) {
+    const game = games.value.find((game) => game.id === gameId);
+    if (!game) return;
     const existsIndex = favGamesIds.value.indexOf(gameId);
     if (existsIndex !== -1) {
       favGamesIds.value.splice(existsIndex, 1);
+      game.isFavorite = false;
       return;
     }
-    recentGamesIds.value.push(gameId);
+    game.isFavorite = true;
+    favGamesIds.value.push(gameId);
   }
 
-  return { games, recentGames, favoriteGames, addRecent, markFavorite };
+  return { games, recentGames, favoriteGames, addRecent, toggleFavorite };
 });
 
 // export const useGamesStore = defineStore('games', () => {

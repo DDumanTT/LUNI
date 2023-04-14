@@ -1,12 +1,7 @@
 <template>
   <GameMenu v-slot="apiProps" :game="game">
-    <Atropos
-      v-bind="apiProps"
-      inner-class="rounded-3xl"
-      :active-offset="100"
-      @click="handleClickGame(game)"
-    >
-      <div class="relative flex h-[16vh] select-none items-center justify-center">
+    <Atropos v-bind="apiProps" inner-class="rounded-3xl" class="" :active-offset="100">
+      <div class="relative flex h-44 select-none items-center justify-center">
         <img
           v-if="game.hero"
           class="h-full w-full object-cover"
