@@ -2,7 +2,7 @@
   <div class="hero-wrapper">
     <div class="logo-wrapper">
       <img
-        v-if="game.logo && false"
+        v-if="game.logo"
         :src="`appdata://${game.logo}`"
         alt="Game logo"
         class="logo"
@@ -13,11 +13,22 @@
       </span>
     </div>
     <div class="play-btn-wrapper">
-      <Button class="play-btn" label="PLAY" icon="pi pi-play" raised @click="handlePlay" />
-      <!-- <GameMenu v-slot="apiProps" :game="game" dropdown class="inline"> -->
-      <Button class="dropdown-btn" label="▾" raised />
-      <Menu ref="menu" :model="menuItems" :popup="true" @click="toggleMenu" />
-      <!-- </GameMenu> -->
+      <Button
+        class="play-btn"
+        label="PLAY"
+        icon="pi pi-play"
+        severity="info"
+        raised
+        @click="handlePlay"
+      />
+      <Button
+        type="button"
+        class="dropdown-btn"
+        label="▾"
+        severity="info"
+        raised
+        @click="openMenu"
+      />
     </div>
   </div>
 </template>
@@ -29,34 +40,17 @@ interface HeroProps {
 </script>
 
 <script lang="ts" setup>
-import { computed, ref } from 'vue';
+import { computed } from 'vue';
 import Button from 'primevue/button';
-import Menu from 'primevue/menu';
-import { MenuItem } from 'primevue/menuitem';
 
 import { Game } from '@shared/types';
-import { useGamesStore } from '@renderer/store';
+import { useGamesStore, useMenuStore } from '@renderer/store';
 import { randomColor } from '../utils';
 
 const props = defineProps<HeroProps>();
 
 const gamesStore = useGamesStore();
-
-const menu = ref();
-const menuItems = ref<MenuItem[]>([
-  {
-    label: 'Play',
-  },
-  {
-    label: 'Favorite',
-  },
-  {
-    label: 'Information',
-  },
-  {
-    label: 'Settings',
-  },
-]);
+const menuStore = useMenuStore();
 
 const heroImage = computed(() => {
   if (props.game.hero) return `url(appdata://${props.game.hero})`;
@@ -64,15 +58,13 @@ const heroImage = computed(() => {
   return `radial-gradient(var(--${color}-500), var(--${color}-900))`;
 });
 
-// const heroLogo = computed(() => {});
-
 const handlePlay = () => {
   gamesStore.addRecent(props.game.id);
-  console.log(props.game);
+  console.log(props.game.name);
 };
 
-const toggleMenu = (evt) => {
-  menu.value.toggle(evt);
+const openMenu = (evt) => {
+  menuStore.openGameMenu(evt, props.game);
 };
 </script>
 
@@ -130,8 +122,5 @@ const toggleMenu = (evt) => {
 }
 :deep(.p-button-icon) {
   font-size: inherit;
-}
-:deep(.p-button) {
-  background-color: var(--primary-color);
 }
 </style>

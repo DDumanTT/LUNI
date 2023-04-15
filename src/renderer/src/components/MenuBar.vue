@@ -1,6 +1,17 @@
 <template>
   <nav class="nav-wrapper">
-    <div class="search">search</div>
+    <div class="search">
+      <Input
+        :value="search"
+        wrapper-class="w-64"
+        icon-left="pi pi-search cursor-pointer"
+        icon-right="pi pi-times cursor-pointer"
+        @input="($event) => (search = ($event.target as HTMLInputElement).value)"
+        @click-right="search = ''"
+        @click-left="handleSearch"
+        @keydown.enter="handleSearch"
+      />
+    </div>
     <div class="nav-tabs">
       <TabMenu :model="items" />
     </div>
@@ -12,6 +23,9 @@
 import { ref } from 'vue';
 import TabMenu from 'primevue/tabmenu';
 import { MenuItem } from 'primevue/menuitem';
+import Input from './Input.vue';
+
+const search = ref('');
 
 const items = ref<MenuItem[]>([
   {
@@ -30,6 +44,10 @@ const items = ref<MenuItem[]>([
     to: '/friends',
   },
 ]);
+
+const handleSearch = () => {
+  console.log(search.value);
+};
 </script>
 
 <style scoped lang="postcss">
@@ -43,7 +61,6 @@ const items = ref<MenuItem[]>([
   justify-content: center;
   border-bottom: 1px solid black;
   background: rgb(0 0 0 / 0.6);
-  padding-inline: 1rem;
   backdrop-filter: blur(10px);
   font-size: var(--font-size);
 }

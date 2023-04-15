@@ -1,88 +1,114 @@
 <template>
-  <div class="flex h-full flex-col items-center justify-center text-center text-xl">
-    <div
-      class="relative max-h-[80%] rounded-xl border-4 border-primary-7 bg-primary-3 px-16 py-10 shadow-2xl"
-    >
-      <div
-        class="absolute -top-2 -left-2 -z-50 h-[calc(100%+1rem)] w-[calc(100%+1rem)] rounded-xl border-8 border-primary-7 blur-md"
-      />
-      <div class="flex h-full flex-col">
-        <component
-          :is="steps[step].component"
-          v-bind="steps[step].data"
-          v-on="steps[step].events"
+  <div class="main-panel-wrapper">
+    <div class="main-panel">
+      <div class="glow" />
+      <div class="content">
+        <Splash v-if="step === 0" />
+        <LauncherPathsForm v-if="step === 1" :paths="launcherPaths" @update="handleUpdatePath" />
+        <GameSelection
+          v-if="step === 2"
+          :games="gamesList"
+          :paths="launcherPaths"
+          :selected="selectedGames"
+          @update:games="handleUpdateGames"
+          @update:selection="handleUpdateSelection"
         />
-        <div class="mt-8 flex items-center justify-between gap-4">
-          <Button v-if="step <= 0" color="error" @click="firstStart = false"> Skip </Button>
-          <Button v-else color="primary" important @click="step--"> Back </Button>
+        <div class="buttons">
+          <Button
+            v-if="step <= 0"
+            label="Skip"
+            severity="danger"
+            outlined
+            @click="firstStart = false"
+          />
+          <Button v-else label="Back" important @click="step--" />
           <div class="flex-1">{{ step }}</div>
-          <Button v-if="step >= steps.length - 1" color="primary" important @click="handleFinish">
-            Finish
-          </Button>
-          <Button v-else color="primary" important @click="step++"> Continue </Button>
+          <Button v-if="step >= 2" label="Finish" severity="success" @click="handleFinish" />
+          <Button v-else label="Continue" @click="step++" />
         </div>
       </div>
     </div>
   </div>
 </template>
 
-<script lang="ts">
-interface GameListItem extends Game {
-  selected?: boolean;
-}
-</script>
-
 <script setup lang="ts">
-import { reactive, ref } from 'vue';
+import { ref } from 'vue';
 import { useLocalStorage } from '@vueuse/core';
+import Button from 'primevue/button';
 
 import GameSelection from '@renderer/components/intro/GameSelection.vue';
 import LauncherPathsForm from '@renderer/components/intro/LauncherPathsForm.vue';
 import Splash from '@renderer/components/intro/Splash.vue';
-import Button from '@renderer/components/Button.vue';
 import { useGamesStore, launcherPaths } from '@renderer/store';
 import { Game } from '@shared/types';
 
+const firstStart = useLocalStorage('firstStart', true);
 const gamesStore = useGamesStore();
 
-const gamesList = ref<GameListItem[]>([]);
-
-const steps = [
-  { component: Splash, data: {}, events: {} },
-  {
-    component: LauncherPathsForm,
-    data: { paths: launcherPaths },
-    events: {
-      update: (key: string, value: string) => {
-        launcherPaths.value[key] = value;
-      },
-    },
-  },
-  {
-    component: GameSelection,
-    data: reactive({ games: gamesList, paths: launcherPaths.value }),
-    events: {
-      'update:games': (games: GameListItem[]) => {
-        gamesList.value = games;
-      },
-      'update:toggle': (game: GameListItem) => {
-        const gameToUpdate = gamesList.value.find((g) => g.id === game.id);
-        if (!gameToUpdate) return;
-        gameToUpdate.selected = !gameToUpdate.selected;
-      },
-    },
-  },
-];
 const step = ref(0);
+const gamesList = ref<Game[]>([]);
+const selectedGames = ref<Game[]>([]);
 
-const firstStart = useLocalStorage('firstStart', true);
+const handleUpdatePath = (key: string, value: string) => {
+  launcherPaths.value[key] = value;
+};
+
+const handleUpdateGames = (games: Game[]) => {
+  gamesList.value = games;
+};
+
+const handleUpdateSelection = (games: Game[]) => {
+  selectedGames.value = games;
+};
 
 const handleFinish = async () => {
-  gamesStore.games = gamesList.value
-    .filter((game) => game.selected)
-    .map(({ selected, ...rest }) => rest);
+  gamesStore.games = selectedGames.value;
   firstStart.value = false;
 };
 </script>
 
-<style lang=""></style>
+<style lang="postcss" scoped>
+.main-panel-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+  font-size: 1.25rem;
+}
+.main-panel {
+  position: relative;
+  max-height: 80%;
+  border-radius: var(--border-radius);
+  border-width: 4px;
+  border-color: var(--indigo-700);
+  background-color: var(--indigo-900);
+  padding-inline: 4rem;
+  padding-block: 2.5rem;
+}
+.glow {
+  position: absolute;
+  top: -1rem;
+  left: -1rem;
+  height: calc(100% + 2rem);
+  width: calc(100% + 2rem);
+  border-radius: var(--border-radius);
+  border-width: 1rem;
+  border-color: var(--indigo-700);
+  pointer-events: none;
+  filter: blur(1rem);
+}
+.content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.buttons {
+  margin-top: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+</style>

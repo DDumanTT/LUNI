@@ -62,7 +62,7 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window);
   });
 
-  // devTools.install('VUEJS3_DEVTOOLS', { allowFileAccess: true });
+  devTools.install('VUEJS3_DEVTOOLS', { allowFileAccess: true });
 
   optimizer.registerFramelessWindowIpc();
 

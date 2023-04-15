@@ -1,29 +1,22 @@
 <template>
-  <GameMenu v-slot="apiProps" :game="game">
-    <Atropos v-bind="apiProps" inner-class="rounded-3xl" class="" :active-offset="100">
-      <div class="relative flex h-44 select-none items-center justify-center">
-        <img
-          v-if="game.hero"
-          class="h-full w-full object-cover"
-          :src="`appdata://${game.hero}`"
-          data-atropos-offset="-1"
-        />
-        <div v-else class="h-full w-full bg-secondary-3" data-atropos-offset="-1" />
-        <img
-          v-if="game.logo"
-          class="absolute w-2/3 object-scale-down"
-          :src="`appdata://${game.logo}`"
-          data-atropos-offset="5"
-        />
-        <span
-          v-else
-          class="absolute w-10/12 text-center font-pressstart2p text-2xl text-neutral-12"
-          data-atropos-offset="5"
-          >{{ game.name }}</span
-        >
-      </div>
-    </Atropos>
-  </GameMenu>
+  <Atropos
+    inner-class="rounded-3xl"
+    :active-offset="100"
+    @click="handleClickGame(game)"
+    @contextmenu="handleOpenContextMenu"
+  >
+    <div class="card">
+      <img
+        v-if="game.hero"
+        class="cover"
+        :src="`appdata://${game.hero}`"
+        data-atropos-offset="-1"
+      />
+      <div v-else class="cover fallback-cover" data-atropos-offset="-1" />
+      <img v-if="game.logo" :src="`appdata://${game.logo}`" class="logo" data-atropos-offset="5" />
+      <span v-else class="fallback-logo" data-atropos-offset="5">{{ game.name }}</span>
+    </div>
+  </Atropos>
 </template>
 
 <script lang="ts">
@@ -33,22 +26,64 @@ interface GameCardProps {
 </script>
 
 <script setup lang="ts">
+import { computed } from 'vue';
 import Atropos from 'atropos/vue';
 
-import { useGamesStore } from '@renderer/store';
+import { useGamesStore, useMenuStore } from '@renderer/store';
 import { Game } from '@shared/types';
-import GameMenu from './GameMenu.vue';
+import { randomColor } from '../utils';
 
 const props = defineProps<GameCardProps>();
 const emit = defineEmits(['click']);
 
 const gamesStore = useGamesStore();
+const menuStore = useMenuStore();
+
+const coverImageFallback = computed(() => {
+  const color = randomColor();
+  return `radial-gradient(var(--${color}-500), var(--${color}-900))`;
+});
 
 const handleClickGame = (game: Game) => {
   emit('click');
-  console.log(game);
+  console.log(game.name);
   gamesStore.addRecent(game.id);
+};
+
+const handleOpenContextMenu = (evt) => {
+  menuStore.openGameContextMenu(evt, props.game);
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="postcss" scoped>
+.card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 11rem;
+  user-select: none;
+}
+.cover {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+}
+.fallback-cover {
+  background-image: v-bind(coverImageFallback);
+}
+.logo {
+  position: absolute;
+  width: 66%;
+  object-fit: scale-down;
+}
+.fallback-logo {
+  position: absolute;
+  width: 83.333333%;
+  text-align: center;
+  font-family: PressStart2P, sans-serif;
+  font-size: 1.5rem;
+  color: var(--text-color);
+  text-shadow: black 0px 0px 20px;
+}
+</style>

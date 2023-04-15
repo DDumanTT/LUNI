@@ -28,7 +28,7 @@ function handleClick(command: 'min' | 'max' | 'close'): void {
 .logo {
   margin-left: 0.125rem;
   font-family: PressStart2P, sans-serif;
-  color: var(--primary-color);
+  color: var(--indigo-600);
 }
 .window-controls {
   -webkit-app-region: no-drag;

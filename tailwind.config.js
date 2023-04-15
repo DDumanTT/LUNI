@@ -24,10 +24,5 @@ module.exports = {
       },
     },
   },
-  plugins: [
-    require('@tailwindcss/forms'),
-    require('windy-radix-palette'),
-    require('prettier-plugin-tailwindcss'),
-  ],
-  // safelist: ['overflow-overlay'],
+  plugins: [require('windy-radix-palette'), require('prettier-plugin-tailwindcss')],
 };

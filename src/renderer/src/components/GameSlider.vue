@@ -1,7 +1,7 @@
 <template>
   <Swiper
     v-if="props.games.length !== 0"
-    class="overflow-visible"
+    class="h-48 overflow-visible"
     :slides-per-view="2"
     :space-between="32"
     :breakpoints="{
@@ -10,13 +10,14 @@
       1536: { slidesPerView: 5 },
     }"
     :modules="[Scrollbar]"
+    :scrollbar="{ draggable: true }"
     grab-cursor
   >
-    <SwiperSlide v-for="game in props.games" :key="game.id">
+    <SwiperSlide v-for="game in props.games" :key="game.id" class="h-44">
       <GameCard :game="game" />
     </SwiperSlide>
   </Swiper>
-  <div v-else class="flex h-44 w-full items-center justify-center text-4xl text-secondary-11">
+  <div v-else>
     <slot name="fallback">No games</slot>
   </div>
 </template>
@@ -36,4 +37,4 @@ import { Game } from '@shared/types';
 const props = defineProps<SliderProps>();
 </script>
 
-<style scoped></style>
+<style scoped lang="postcss"></style>

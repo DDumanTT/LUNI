@@ -1,6 +1,6 @@
 <template>
   <TitleBar />
-  <div class="overflow-y-overlay flex-1 overflow-x-hidden">
+  <div class="main">
     <FirstStartPage v-if="firstStart" />
     <router-view v-else />
   </div>
@@ -15,4 +15,10 @@ import FirstStartPage from './routes/FirstStartPage.vue';
 const firstStart = useLocalStorage('firstStart', true);
 </script>
 
-<style></style>
+<style scoped lang="postcss">
+.main {
+  overflow-y: overlay;
+  overflow-x: hidden;
+  flex: 1;
+}
+</style>

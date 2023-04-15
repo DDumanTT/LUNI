@@ -1,6 +1,8 @@
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { defineStore } from 'pinia';
 import { useLocalStorage } from '@vueuse/core';
+import { MenuItem } from 'primevue/menuitem';
+import { PrimeIcons } from 'primevue/api';
 
 import { Game, LauncherPaths } from '@shared/types';
 
@@ -44,6 +46,7 @@ export const useGamesStore = defineStore('games', () => {
   function addRecent(gameId: string) {
     const existsIndex = recentGamesIds.value.indexOf(gameId);
     if (existsIndex !== -1) recentGamesIds.value.splice(existsIndex, 1);
+    if (recentGamesIds.value.length >= 10) recentGamesIds.value.pop();
     recentGamesIds.value.unshift(gameId);
   }
   /**
@@ -66,26 +69,70 @@ export const useGamesStore = defineStore('games', () => {
   return { games, recentGames, favoriteGames, addRecent, toggleFavorite };
 });
 
-// export const useGamesStore = defineStore('games', () => {
-//   const _games = ref<Game[]>([]);
+export const useMenuStore = defineStore('menuStore', () => {
+  const gamesStore = useGamesStore();
 
-//   const games = computed(async () => {
-//     if (!_games.value.length) _games.value = await db.games.toArray();
-//     return _games.value;
-//   });
+  const contextMenu = ref();
+  const menu = ref();
+  const items = ref<MenuItem[]>([]);
 
-//   async function set(newGame: Game) {
-//     const index = _games.value.findIndex((game) => game.id === newGame.id);
-//     if (!index) _games.value.push(newGame);
-//     _games.value[index] = newGame;
-//     await db.games.put(newGame);
-//   }
+  const menuGame = ref<Game>();
 
-//   async function bulkSet(newGames: Game[]) {
-//     _games.value = newGames;
-//     await db.games.clear();
-//     await db.games.bulkAdd(newGames);
-//   }
+  const gameMenuItems = computed(() => {
+    if (!menuGame.value) return [];
+    return [
+      {
+        label: menuGame.value.name,
+        items: [
+          {
+            label: 'Play',
+            icon: PrimeIcons.PLAY,
+            command: () => {
+              console.log(menuGame.value?.name);
+              if (menuGame.value) gamesStore.addRecent(menuGame.value.id);
+            },
+          },
+          {
+            label: menuGame.value.isFavorite ? 'Unfavorite' : 'Favorite',
+            icon: menuGame.value.isFavorite ? PrimeIcons.HEART_FILL : PrimeIcons.HEART,
+            command: () => {
+              if (menuGame.value) gamesStore.toggleFavorite(menuGame.value.id);
+            },
+          },
+          {
+            label: 'Information',
+            icon: PrimeIcons.INFO_CIRCLE,
+          },
+          {
+            label: 'Settings',
+            icon: PrimeIcons.COG,
+            command: () => {},
+          },
+        ],
+      },
+    ];
+  });
 
-//   return { games, set, bulkSet };
-// });
+  const openGameMenu = (evt, game: Game) => {
+    menuGame.value = game;
+    items.value = gameMenuItems.value;
+    contextMenu.value.hide();
+    menu.value.toggle(evt);
+  };
+
+  const openGameContextMenu = (evt, game: Game) => {
+    menuGame.value = game;
+    items.value = gameMenuItems.value;
+    menu.value.hide();
+    contextMenu.value.show(evt);
+  };
+
+  const setMenu = (element) => {
+    menu.value = element;
+  };
+  const setContextMenu = (element) => {
+    contextMenu.value = element;
+  };
+
+  return { items, openGameMenu, openGameContextMenu, setMenu, setContextMenu };
+});

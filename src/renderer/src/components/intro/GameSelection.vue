@@ -1,63 +1,58 @@
 <template>
-  <h1 class="mb-8 text-4xl font-bold text-primary-11">Select games</h1>
-  <div class="z-40 h-full overflow-auto rounded-xl">
-    <table class="z-50">
-      <thead>
-        <tr>
-          <td></td>
-          <td></td>
-        </tr>
-      </thead>
-      <tbody>
-        <tr
-          v-for="game in games"
-          :key="`${game.launcher}-${game.id}`"
-          :class="[
-            'p-2',
-            game.selected ? 'bg-success-3 hover:bg-success-4' : 'bg-error-3 hover:bg-error-4',
-          ]"
-          @click="handleToggle(game)"
-        >
-          <td class="p-2">
-            <component :is="launcherIconsMap[game.launcher]" />
-          </td>
-          <td class="pl-2 text-left">{{ game.name }}</td>
-        </tr>
-      </tbody>
-    </table>
+  <div class="h-[60vh]">
+    <DataTable
+      :selection="selected"
+      :value="games"
+      scrollable
+      removable-sort
+      scroll-height="flex"
+      table-style="min-width: 50rem"
+      @update:selection="emit('update:selection', $event)"
+    >
+      <Column selection-mode="multiple" header-style="width: 3rem"></Column>
+      <template #header>
+        <h1 class="title">Select games to import</h1>
+      </template>
+      <Column field="icon" header="Icon" header-style="width: 3rem">
+        <template #body="slotProps">
+          <img
+            v-if="slotProps.data.icon"
+            :src="`appdata://${slotProps.data.icon}`"
+            :alt="`${slotProps.data.name} icon`"
+          />
+          <span v-else>-</span>
+        </template>
+      </Column>
+      <Column field="name" header="Name" sortable></Column>
+      <Column field="launcher" header="Launcher" sortable>
+        <template #body="slotProps">
+          <div class="flex items-center gap-2">
+            <i :class="`pi ${getLauncherIcon(slotProps.data.launcher)}`" />
+            <span>{{ getLauncherName(slotProps.data.launcher) }}</span>
+          </div>
+        </template>
+      </Column>
+    </DataTable>
   </div>
 </template>
 
 <script lang="ts">
 interface GameSelectProps {
-  games: GameListItem[];
+  games: Game[];
   paths: LauncherPaths;
-}
-interface GameListItem extends Game {
-  selected?: boolean;
+  selected: Game[];
 }
 </script>
 
 <script setup lang="ts">
 import { onMounted, ref, toRaw } from 'vue';
-import {
-  IconSteam,
-  IconEpicgames,
-  IconEa,
-  IconUbisoft,
-} from '@iconify-prerendered/vue-simple-icons';
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
 
 import { Game, LauncherPaths } from '@shared/types';
 
 const props = defineProps<GameSelectProps>();
-const emit = defineEmits(['update:games', 'update:toggle']);
-
-const launcherIconsMap: Record<string, SvgComponent> = {
-  steam: IconSteam,
-  epic: IconEpicgames,
-  ea: IconEa,
-  ubisoft: IconUbisoft,
-};
+const emit = defineEmits(['update:games', 'update:selection']);
 
 const loading = ref(true);
 
@@ -65,16 +60,39 @@ onMounted(() => {
   getGames();
 });
 
+const getLauncherName = (name: string) =>
+  ({
+    steam: 'Steam',
+    epic: 'Epic Games',
+    ea: 'Electronic Arts',
+    ubisoft: 'Ubisoft',
+  }[name]);
+
+const getLauncherIcon = (name: string) =>
+  ({
+    steam: 'pi-steam',
+    epic: 'pi-epic',
+    ea: 'pi-ea',
+    ubisoft: 'pi-ubisoft',
+  }[name]);
+
 const getGames = async () => {
-  const res: GameListItem[] = await window.api.scanner.games(toRaw(props.paths));
-  res.forEach((game) => (game.selected = true));
+  const res: Game[] = await window.api.scanner.games(toRaw(props.paths));
   emit('update:games', res);
   loading.value = false;
 };
-
-const handleToggle = (game: GameListItem) => {
-  emit('update:toggle', game);
-};
 </script>
 
-<style lang=""></style>
+<style lang="postcss" scoped>
+:deep(.p-datatable-header),
+:deep(.p-datatable-wrapper) {
+  background: transparent;
+}
+.title {
+  margin-bottom: 2rem;
+  font-size: 2.25rem;
+  line-height: 2.5rem;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+</style>

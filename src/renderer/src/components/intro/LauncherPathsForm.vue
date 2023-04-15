@@ -1,23 +1,21 @@
 <template>
-  <h1 class="mb-8 text-4xl font-bold text-primary-11">Launcher paths</h1>
-  <h2 class="mb-4 font-bold">Select game launcher directories.</h2>
-  <div v-if="!loading" class="h-full overflow-auto">
-    <div class="flex flex-col gap-4">
-      <Input
-        v-for="key in Object.keys(props.paths.value)"
-        :id="key"
-        :key="key"
-        class="cursor-pointer"
-        readonly
-        clearable
-        required
-        :label="launcherNamesMap[key]"
-        :value="props.paths.value[key]"
-        :icon="launcherIconsMap[key]"
-        @click="handlePathChange(key)"
-        @clear="handlePathClear(key)"
-      />
-    </div>
+  <h1 class="title">Launcher paths</h1>
+  <h2 class="subtitle">Select game launcher directories.</h2>
+  <div v-if="!loading" class="form">
+    <Input
+      v-for="key in Object.keys(props.paths)"
+      :id="key"
+      :key="key"
+      class="cursor-pointer"
+      readonly
+      required
+      :label="launcherNamesMap[key]"
+      :value="props.paths[key]"
+      :icon-left="launcherIconsMap[key]"
+      icon-right="pi-times cursor-pointer"
+      @click="handlePathChange(key)"
+      @click-right="handlePathClear(key)"
+    />
   </div>
   <template v-else>Loading...</template>
 </template>
@@ -30,12 +28,6 @@ interface PathsFormProps {
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import {
-  IconSteam,
-  IconEpicgames,
-  IconEa,
-  IconUbisoft,
-} from '@iconify-prerendered/vue-simple-icons';
 
 import Input from '../Input.vue';
 import { LauncherPaths } from '@shared/types';
@@ -43,11 +35,11 @@ import { LauncherPaths } from '@shared/types';
 const props = defineProps<PathsFormProps>();
 const emit = defineEmits(['update']);
 
-const launcherIconsMap: Record<string, SvgComponent> = {
-  steam: IconSteam,
-  epic: IconEpicgames,
-  ea: IconEa,
-  ubisoft: IconUbisoft,
+const launcherIconsMap: Record<string, string> = {
+  steam: 'pi-steam h-6 w-6 !left-2 !-mt-3',
+  epic: 'pi-epic h-6 w-6 !left-2 !-mt-3',
+  ea: 'pi-ea h-6 w-6 !left-2 !-mt-3',
+  ubisoft: 'pi-ubisoft h-6 w-6 !left-2 !-mt-3',
 };
 const launcherNamesMap: Record<string, string> = {
   steam: 'Steam',
@@ -74,11 +66,33 @@ const handlePathClear = (key: string) => {
 
 const getLauncherPaths = async () => {
   const newPaths = await window.api.scanner.paths();
-  Object.keys(props.paths.value).forEach((key) => {
-    if (props.paths.value[key] === '' && newPaths[key]) emit('update', key, newPaths[key]);
+  Object.keys(props.paths).forEach((key) => {
+    if (props.paths[key] === '' && newPaths[key]) emit('update', key, newPaths[key]);
   });
   loading.value = false;
 };
 </script>
 
-<style lang=""></style>
+<style lang="postcss" scoped>
+.title {
+  margin-bottom: 2rem;
+  font-size: 2.25rem;
+  line-height: 2.5rem;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+.subtitle {
+  margin-bottom: 1rem;
+  font-weight: 700;
+}
+.form {
+  height: 100%;
+  overflow: auto;
+  & > * {
+    margin-bottom: 1rem;
+  }
+  & > *:last-child {
+    margin-bottom: 0;
+  }
+}
+</style>
