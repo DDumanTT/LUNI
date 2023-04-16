@@ -1,5 +1,5 @@
 import { readdir, readFile, access, mkdir, copyFile } from 'node:fs/promises';
-import { join, normalize } from 'node:path';
+import { join } from 'node:path';
 import { app } from 'electron';
 import { enumerateValues, HKEY } from 'registry-js';
 

@@ -1,6 +1,7 @@
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
 import PrimeVue from 'primevue/config';
+import ToastService from 'primevue/toastservice';
 import 'swiper/css';
 import 'swiper/css/scrollbar';
 import 'atropos/css';
@@ -10,6 +11,7 @@ import './assets/css/styles.css';
 import 'primevue/resources/themes/viva-dark/theme.css';
 import 'primevue/resources/primevue.min.css';
 import 'primeicons/primeicons.css';
+// import 'primeflex/primeflex.css';
 
 import App from './App.vue';
 import router from './routes/router';
@@ -20,4 +22,5 @@ const app = createApp(App);
 app.use(router);
 app.use(pinia);
 app.use(PrimeVue);
+app.use(ToastService);
 app.mount('#app');

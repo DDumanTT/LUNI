@@ -1,7 +1,8 @@
 <template>
   <Swiper
     v-if="props.games.length !== 0"
-    class="h-48 overflow-visible"
+    class="slider"
+    wrapper-class="h-fit"
     :slides-per-view="2"
     :space-between="32"
     :breakpoints="{
@@ -10,10 +11,10 @@
       1536: { slidesPerView: 5 },
     }"
     :modules="[Scrollbar]"
-    :scrollbar="{ draggable: true }"
+    :scrollbar="{ draggable: true, horizontalClass: '!-bottom-4' }"
     grab-cursor
   >
-    <SwiperSlide v-for="game in props.games" :key="game.id" class="h-44">
+    <SwiperSlide v-for="game in props.games" :key="game.id" class="slide">
       <GameCard :game="game" />
     </SwiperSlide>
   </Swiper>
@@ -37,4 +38,12 @@ import { Game } from '@shared/types';
 const props = defineProps<SliderProps>();
 </script>
 
-<style scoped lang="postcss"></style>
+<style scoped lang="postcss">
+.slider {
+  height: 100%;
+  overflow: visible;
+}
+.slide {
+  height: fit-content;
+}
+</style>

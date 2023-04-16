@@ -3,6 +3,7 @@ import { defineStore } from 'pinia';
 import { useLocalStorage } from '@vueuse/core';
 import { MenuItem } from 'primevue/menuitem';
 import { PrimeIcons } from 'primevue/api';
+import { useToast } from 'primevue/usetoast';
 
 import { Game, LauncherPaths } from '@shared/types';
 
@@ -21,6 +22,8 @@ export const useGamesStore = defineStore('games', () => {
   const games = useLocalStorage<Game[]>('games', []);
   const recentGamesIds = useLocalStorage<string[]>('recentGamesIds', []);
   const favGamesIds = useLocalStorage<string[]>('favGamesIds', []);
+
+  const toast = useToast();
 
   const recentGames = computed(() =>
     recentGamesIds.value.reduce((recentGames, id) => {
@@ -66,7 +69,44 @@ export const useGamesStore = defineStore('games', () => {
     favGamesIds.value.push(gameId);
   }
 
-  return { games, recentGames, favoriteGames, addRecent, toggleFavorite };
+  let timeout: NodeJS.Timeout | undefined;
+  const LAUNCH_TIMEOUT = 3000;
+  /**
+   * Launches game
+   * @param gameId ID of a game to launch
+   */
+  function launchGame(game: Game) {
+    if (timeout)
+      return toast.add({
+        severity: 'error',
+        summary: 'You are already launching a game.',
+        detail: 'Cancel it to continue.',
+        group: 'launch',
+        life: LAUNCH_TIMEOUT,
+      });
+    toast.add({
+      severity: 'success',
+      summary: 'Launching game...',
+      detail: `${game.name} launching in 3 seconds. Close message to cancel.`,
+      group: 'launch',
+      life: LAUNCH_TIMEOUT,
+    });
+    timeout = setTimeout(() => {
+      addRecent(game.id);
+      window.api.scanner.launch(game.id, game.launcher);
+      timeout = undefined;
+    }, LAUNCH_TIMEOUT);
+  }
+
+  /**
+   * Cancels game launching
+   */
+  function cancelLaunch() {
+    clearTimeout(timeout);
+    timeout = undefined;
+  }
+
+  return { games, recentGames, favoriteGames, addRecent, toggleFavorite, launchGame, cancelLaunch };
 });
 
 export const useMenuStore = defineStore('menuStore', () => {
@@ -89,7 +129,7 @@ export const useMenuStore = defineStore('menuStore', () => {
             icon: PrimeIcons.PLAY,
             command: () => {
               console.log(menuGame.value?.name);
-              if (menuGame.value) gamesStore.addRecent(menuGame.value.id);
+              if (menuGame.value) gamesStore.launchGame(menuGame.value);
             },
           },
           {

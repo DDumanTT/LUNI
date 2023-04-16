@@ -50,6 +50,7 @@ import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 
 import { Game, LauncherPaths } from '@shared/types';
+import { getLauncherName, getLauncherIcon } from '@renderer/utils';
 
 const props = defineProps<GameSelectProps>();
 const emit = defineEmits(['update:games', 'update:selection']);
@@ -59,22 +60,6 @@ const loading = ref(true);
 onMounted(() => {
   getGames();
 });
-
-const getLauncherName = (name: string) =>
-  ({
-    steam: 'Steam',
-    epic: 'Epic Games',
-    ea: 'Electronic Arts',
-    ubisoft: 'Ubisoft',
-  }[name]);
-
-const getLauncherIcon = (name: string) =>
-  ({
-    steam: 'pi-steam',
-    epic: 'pi-epic',
-    ea: 'pi-ea',
-    ubisoft: 'pi-ubisoft',
-  }[name]);
 
 const getGames = async () => {
   const res: Game[] = await window.api.scanner.games(toRaw(props.paths));

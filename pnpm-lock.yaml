@@ -35,6 +35,7 @@ specifiers:
   postcss-import: ^15.1.0
   prettier: ^2.8.4
   prettier-plugin-tailwindcss: ^0.2.5
+  primeflex: ^3.3.0
   primeicons: ^6.0.1
   primevue: ^3.26.1
   registry-js: ^1.15.1
@@ -62,6 +63,7 @@ dependencies:
   electron-updater: 5.3.0
   firebase: 9.19.1
   pinia: 2.0.33_hmuptsblhheur2tugfgucj7gc4
+  primeflex: 3.3.0
   primeicons: 6.0.1
   primevue: 3.26.1_lksi2hrxe57qe2yasjpvmju34y
   registry-js: 1.15.1
@@ -4412,6 +4414,10 @@ packages:
     engines: {node: '>=10.13.0'}
     hasBin: true
     dev: true
+
+  /primeflex/3.3.0:
+    resolution: {integrity: sha512-4hvyIO7lERN5bnyURn67Qpozghins8Jq/GSXO6tymc3oa2ADHWuiYBti8ZptPwHu+uD/HTEisS26NEmeIGfPZQ==}
+    dev: false
 
   /primeicons/6.0.1:
     resolution: {integrity: sha512-KDeO94CbWI4pKsPnYpA1FPjo79EsY9I+M8ywoPBSf9XMXoe/0crjbUK7jcQEDHuc0ZMRIZsxH3TYLv4TUtHmAA==}

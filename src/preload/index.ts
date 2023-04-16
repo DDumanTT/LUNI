@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron';
-import { electronAPI, ElectronAPI } from '@electron-toolkit/preload';
+import { electronAPI } from '@electron-toolkit/preload';
 import { Game, LauncherPaths } from '@shared/types';
 
 // Custom APIs for renderer
@@ -10,6 +10,8 @@ export const api = {
   scanner: {
     paths: (): Promise<LauncherPaths> => ipcRenderer.invoke('games:paths'),
     games: (paths: LauncherPaths): Promise<Game[]> => ipcRenderer.invoke('games:all', paths),
+    launch: (gameId: string, launcher: string) =>
+      ipcRenderer.send('games:launch', gameId, launcher),
   },
 };
 

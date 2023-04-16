@@ -1,21 +1,16 @@
 <template>
   <nav class="nav-wrapper">
-    <div class="search">
-      <Input
-        :value="search"
-        wrapper-class="w-64"
-        icon-left="pi pi-search cursor-pointer"
-        icon-right="pi pi-times cursor-pointer"
-        @input="($event) => (search = ($event.target as HTMLInputElement).value)"
-        @click-right="search = ''"
-        @click-left="handleSearch"
-        @keydown.enter="handleSearch"
-      />
+    <div class="users">
+      <span class="ml-1">
+        <Button label="Sign In" rounded outlined />
+      </span>
     </div>
     <div class="nav-tabs">
       <TabMenu :model="items" />
     </div>
-    <div class="users">user</div>
+    <div class="settings">
+      <Button class="mr-1" icon="pi pi-cog" plain text rounded />
+    </div>
   </nav>
 </template>
 
@@ -23,9 +18,7 @@
 import { ref } from 'vue';
 import TabMenu from 'primevue/tabmenu';
 import { MenuItem } from 'primevue/menuitem';
-import Input from './Input.vue';
-
-const search = ref('');
+import Button from 'primevue/button';
 
 const items = ref<MenuItem[]>([
   {
@@ -35,19 +28,15 @@ const items = ref<MenuItem[]>([
   },
   {
     label: 'Games',
-    icon: 'pi pi-fw pi-home',
+    icon: 'pi pi-fw pi-th-large',
     to: '/games',
   },
   {
-    label: 'Friends',
-    icon: 'pi pi-fw pi-home',
+    label: 'Social',
+    icon: 'pi pi-fw pi-users',
     to: '/friends',
   },
 ]);
-
-const handleSearch = () => {
-  console.log(search.value);
-};
 </script>
 
 <style scoped lang="postcss">
@@ -64,16 +53,16 @@ const handleSearch = () => {
   backdrop-filter: blur(10px);
   font-size: var(--font-size);
 }
-.search {
+.settings {
+  display: flex;
   flex: 1;
+  justify-content: flex-end;
 }
 .nav-tabs {
   height: 100%;
 }
 .users {
-  display: flex;
   flex: 1;
-  justify-content: flex-end;
 }
 :deep(.p-tabmenu) {
   font-size: var(--font-size);

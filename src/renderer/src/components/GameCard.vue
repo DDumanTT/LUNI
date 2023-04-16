@@ -11,9 +11,16 @@
         class="cover"
         :src="`appdata://${game.hero}`"
         data-atropos-offset="-1"
+        draggable="false"
       />
       <div v-else class="cover fallback-cover" data-atropos-offset="-1" />
-      <img v-if="game.logo" :src="`appdata://${game.logo}`" class="logo" data-atropos-offset="5" />
+      <img
+        v-if="game.logo"
+        :src="`appdata://${game.logo}`"
+        class="logo"
+        data-atropos-offset="5"
+        draggable="false"
+      />
       <span v-else class="fallback-logo" data-atropos-offset="5">{{ game.name }}</span>
     </div>
   </Atropos>
@@ -22,6 +29,7 @@
 <script lang="ts">
 interface GameCardProps {
   game: Game;
+  aspectRatio?: string;
 }
 </script>
 
@@ -33,8 +41,7 @@ import { useGamesStore, useMenuStore } from '@renderer/store';
 import { Game } from '@shared/types';
 import { randomColor } from '../utils';
 
-const props = defineProps<GameCardProps>();
-const emit = defineEmits(['click']);
+const props = withDefaults(defineProps<GameCardProps>(), { aspectRatio: '16/9' });
 
 const gamesStore = useGamesStore();
 const menuStore = useMenuStore();
@@ -45,9 +52,7 @@ const coverImageFallback = computed(() => {
 });
 
 const handleClickGame = (game: Game) => {
-  emit('click');
-  console.log(game.name);
-  gamesStore.addRecent(game.id);
+  gamesStore.launchGame(game);
 };
 
 const handleOpenContextMenu = (evt) => {
@@ -61,8 +66,9 @@ const handleOpenContextMenu = (evt) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 11rem;
+  height: 100%;
   user-select: none;
+  aspect-ratio: v-bind(aspectRatio);
 }
 .cover {
   height: 100%;

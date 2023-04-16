@@ -19,6 +19,7 @@
         icon="pi pi-play"
         severity="info"
         raised
+        rounded
         @click="handlePlay"
       />
       <Button
@@ -27,6 +28,7 @@
         label="▾"
         severity="info"
         raised
+        rounded
         @click="openMenu"
       />
     </div>
@@ -59,8 +61,7 @@ const heroImage = computed(() => {
 });
 
 const handlePlay = () => {
-  gamesStore.addRecent(props.game.id);
-  console.log(props.game.name);
+  gamesStore.launchGame(props.game);
 };
 
 const openMenu = (evt) => {

@@ -86,17 +86,32 @@ app.on('window-all-closed', () => {
 
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.
+import { exec, spawn } from 'child_process';
 
 import { GameScanner } from './scanner/GameScanner';
-import { LauncherPaths } from '@shared/types';
+import { Game, LauncherPaths } from '@shared/types';
+import { openDirPicker } from './dialog';
 
 const gameScanner = new GameScanner();
 ipcMain.handle('games:paths', gameScanner.getPaths);
 ipcMain.handle('games:all', async (_: IpcMainInvokeEvent, paths: LauncherPaths) => {
   gameScanner.setPaths(paths);
-  return await gameScanner.scan();
+  const games = await gameScanner.scan();
+  return games.sort((a, b) => (a.name > b.name ? 1 : b.name > a.name ? -1 : 0));
 });
-
-import { openDirPicker } from './dialog';
+ipcMain.on('games:launch', (_: IpcMainInvokeEvent, gameId: string, launcher: string) => {
+  let command;
+  switch (launcher) {
+    case 'steam':
+      command = `start "" "steam://rungameid/${gameId}"`;
+      break;
+    case 'epic':
+      command = `start "" "com.epicgames.launcher://apps/${gameId}?action=launch&silent=true"`;
+      break;
+    default:
+      throw new Error('Invalid launcher');
+  }
+  exec(command);
+});
 
 ipcMain.handle('dialog:open-dir', openDirPicker);

@@ -1,7 +1,7 @@
 interface Directory<T> {
   name: string;
-  path?: string;
-  getPath(): string | undefined;
+  path: string;
+  getPath(): string;
   getContent(): Promise<T[]>;
 }
 
@@ -12,4 +12,4 @@ interface ContentScanner<T> {
   addDirectory(directory: Directory<T>): void;
 }
 
-export { Directory, ContentScanner };
+export { type Directory, type ContentScanner };

@@ -22,7 +22,7 @@
             @click="firstStart = false"
           />
           <Button v-else label="Back" important @click="step--" />
-          <div class="flex-1">{{ step }}</div>
+          <div class="flex-1">{{ step + 1 }}/3</div>
           <Button v-if="step >= 2" label="Finish" severity="success" @click="handleFinish" />
           <Button v-else label="Continue" @click="step++" />
         </div>

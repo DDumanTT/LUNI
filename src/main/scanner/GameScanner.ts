@@ -1,4 +1,5 @@
 import Steam from './launchers/Steam';
+import Epic from './launchers/Epic';
 import { Game } from '@shared/types';
 import { Directory, ContentScanner } from './types';
 
@@ -48,6 +49,7 @@ class GameScanner extends AbstractScanner<Game> {
     super();
 
     this.addDirectory(new Steam());
+    this.addDirectory(new Epic());
   }
 }
 
