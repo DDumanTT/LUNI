@@ -11,7 +11,8 @@ import './assets/css/styles.css';
 import 'primevue/resources/themes/viva-dark/theme.css';
 import 'primevue/resources/primevue.min.css';
 import 'primeicons/primeicons.css';
-// import 'primeflex/primeflex.css';
+
+import './firebase/index';
 
 import App from './App.vue';
 import router from './routes/router';

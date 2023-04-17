@@ -115,6 +115,9 @@ export const useMenuStore = defineStore('menuStore', () => {
   const contextMenu = ref();
   const menu = ref();
   const items = ref<MenuItem[]>([]);
+  const modalVisible = ref(false);
+  const modalComponent = ref('');
+  const modalProps = ref({});
 
   const menuGame = ref<Game>();
 
@@ -128,7 +131,6 @@ export const useMenuStore = defineStore('menuStore', () => {
             label: 'Play',
             icon: PrimeIcons.PLAY,
             command: () => {
-              console.log(menuGame.value?.name);
               if (menuGame.value) gamesStore.launchGame(menuGame.value);
             },
           },
@@ -167,6 +169,11 @@ export const useMenuStore = defineStore('menuStore', () => {
     contextMenu.value.show(evt);
   };
 
+  const openGameInfoModal = (game: Game) => {
+    modalVisible.value = true;
+    modalComponent.value = 'GameInfo';
+  };
+
   const setMenu = (element) => {
     menu.value = element;
   };
@@ -174,5 +181,14 @@ export const useMenuStore = defineStore('menuStore', () => {
     contextMenu.value = element;
   };
 
-  return { items, openGameMenu, openGameContextMenu, setMenu, setContextMenu };
+  return {
+    items,
+    modalVisible,
+    modalComponent,
+    openGameMenu,
+    openGameContextMenu,
+    openGameInfoModal,
+    setMenu,
+    setContextMenu,
+  };
 });

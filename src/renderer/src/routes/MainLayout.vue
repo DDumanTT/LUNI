@@ -3,6 +3,9 @@
   <router-view />
   <ContextMenu ref="contextMenu" :model="menuStore.items" />
   <Menu ref="menu" :model="menuStore.items" :popup="true" />
+  <Dialog v-model="menuStore.modalVisible" modal>
+    <component :is="menuStore.modalComponent" />
+  </Dialog>
   <Toast class="!top-[90px]" group="launch" @close="gamesStore.cancelLaunch" />
 </template>
 
@@ -12,6 +15,7 @@ import MenuBar from '@renderer/components/MenuBar.vue';
 import { useMenuStore, useGamesStore } from '@renderer/store';
 import ContextMenu from 'primevue/contextmenu';
 import Menu from 'primevue/menu';
+import Dialog from 'primevue/dialog';
 import Toast from 'primevue/toast';
 
 const menuStore = useMenuStore();
