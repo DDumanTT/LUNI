@@ -5,6 +5,7 @@ specifiers:
   '@electron-toolkit/tsconfig': ^1.0.1
   '@electron-toolkit/utils': ^1.0.2
   '@electron/notarize': ^1.2.3
+  '@fortawesome/fontawesome-free': ^6.4.0
   '@iconify-prerendered/vue-majesticons': ^0.22.1672653934
   '@iconify-prerendered/vue-pixelarticons': ^0.22.1661146831
   '@iconify-prerendered/vue-simple-icons': ^0.22.1679296367
@@ -53,6 +54,7 @@ specifiers:
 dependencies:
   '@electron-toolkit/preload': 1.0.3_electron@22.3.3
   '@electron-toolkit/utils': 1.0.2_electron@22.3.3
+  '@fortawesome/fontawesome-free': 6.4.0
   '@iconify-prerendered/vue-majesticons': 0.22.1672653934_vue@3.2.47
   '@iconify-prerendered/vue-pixelarticons': 0.22.1661146831_vue@3.2.47
   '@iconify-prerendered/vue-simple-icons': 0.22.1679296367_vue@3.2.47
@@ -1286,6 +1288,12 @@ packages:
     resolution: {integrity: sha512-+sAUfpQ3Frz+VCbPCqj+cZzvEESy3fjSeT/pDWkYCWOBXYNNKZfuVsHuv8/JO2zze8+Eb/Q7a6hZVgzS81fLbQ==}
     dependencies:
       '@floating-ui/core': 1.2.5
+    dev: false
+
+  /@fortawesome/fontawesome-free/6.4.0:
+    resolution: {integrity: sha512-0NyytTlPJwB/BF5LtRV8rrABDbe3TdTXqNB3PdZ+UUUZAEIrdOJdmABqKjt4AXwIoJNaRVVZEXxpNrqvE1GAYQ==}
+    engines: {node: '>=6'}
+    requiresBuild: true
     dev: false
 
   /@grpc/grpc-js/1.7.3:

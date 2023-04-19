@@ -1,29 +1,31 @@
 <template>
-  <Atropos
-    inner-class="rounded-3xl"
-    :active-offset="100"
-    @click="handleClickGame(game)"
-    @contextmenu="handleOpenContextMenu"
-  >
-    <div class="card">
-      <img
-        v-if="game.hero"
-        class="cover"
-        :src="`appdata://${game.hero}`"
-        data-atropos-offset="-1"
-        draggable="false"
-      />
-      <div v-else class="cover fallback-cover" data-atropos-offset="-1" />
-      <img
-        v-if="game.logo"
-        :src="`appdata://${game.logo}`"
-        class="logo"
-        data-atropos-offset="5"
-        draggable="false"
-      />
-      <span v-else class="fallback-logo" data-atropos-offset="5">{{ game.name }}</span>
-    </div>
-  </Atropos>
+  <GameMenu v-slot="menuProps" :game="props.game" context>
+    <Atropos
+      v-bind="menuProps"
+      inner-class="rounded-3xl"
+      :active-offset="100"
+      @click="handleClickGame(game)"
+    >
+      <div class="card">
+        <img
+          v-if="game.hero"
+          class="cover"
+          :src="`appdata://${game.hero}`"
+          data-atropos-offset="-1"
+          draggable="false"
+        />
+        <div v-else class="cover fallback-cover" data-atropos-offset="-1" />
+        <img
+          v-if="game.logo"
+          :src="`appdata://${game.logo}`"
+          class="logo"
+          data-atropos-offset="5"
+          draggable="false"
+        />
+        <span v-else class="fallback-logo" data-atropos-offset="5">{{ game.name }}</span>
+      </div>
+    </Atropos>
+  </GameMenu>
 </template>
 
 <script lang="ts">
@@ -37,14 +39,14 @@ interface GameCardProps {
 import { computed } from 'vue';
 import Atropos from 'atropos/vue';
 
-import { useGamesStore, useMenuStore } from '@renderer/store';
+import { useGamesStore } from '@renderer/store';
 import { Game } from '@shared/types';
 import { randomColor } from '../utils';
+import GameMenu from './GameMenu.vue';
 
 const props = withDefaults(defineProps<GameCardProps>(), { aspectRatio: '16/9' });
 
 const gamesStore = useGamesStore();
-const menuStore = useMenuStore();
 
 const coverImageFallback = computed(() => {
   const color = randomColor();
@@ -53,10 +55,6 @@ const coverImageFallback = computed(() => {
 
 const handleClickGame = (game: Game) => {
   gamesStore.launchGame(game);
-};
-
-const handleOpenContextMenu = (evt) => {
-  menuStore.openGameContextMenu(evt, props.game);
 };
 </script>
 

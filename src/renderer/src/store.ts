@@ -116,8 +116,8 @@ export const useMenuStore = defineStore('menuStore', () => {
   const menu = ref();
   const items = ref<MenuItem[]>([]);
   const modalVisible = ref(false);
-  const modalComponent = ref('');
-  const modalProps = ref({});
+  // const modalComponent = ref('');
+  // const modalProps = ref({});
 
   const menuGame = ref<Game>();
 
@@ -169,10 +169,10 @@ export const useMenuStore = defineStore('menuStore', () => {
     contextMenu.value.show(evt);
   };
 
-  const openGameInfoModal = (game: Game) => {
-    modalVisible.value = true;
-    modalComponent.value = 'GameInfo';
-  };
+  // const openGameInfoModal = (game: Game) => {
+  //   modalVisible.value = true;
+  //   modalComponent.value = 'GameInfo';
+  // };
 
   const setMenu = (element) => {
     menu.value = element;
@@ -184,10 +184,10 @@ export const useMenuStore = defineStore('menuStore', () => {
   return {
     items,
     modalVisible,
-    modalComponent,
+    // modalComponent,
     openGameMenu,
     openGameContextMenu,
-    openGameInfoModal,
+    // openGameInfoModal,
     setMenu,
     setContextMenu,
   };

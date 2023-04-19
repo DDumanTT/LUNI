@@ -22,15 +22,17 @@
         rounded
         @click="handlePlay"
       />
-      <Button
-        type="button"
-        class="dropdown-btn"
-        label="▾"
-        severity="info"
-        raised
-        rounded
-        @click="openMenu"
-      />
+      <GameMenu v-slot="menuProps" :game="props.game">
+        <Button
+          v-bind="menuProps"
+          type="button"
+          class="dropdown-btn"
+          label="▾"
+          severity="info"
+          raised
+          rounded
+        />
+      </GameMenu>
     </div>
   </div>
 </template>
@@ -46,13 +48,13 @@ import { computed } from 'vue';
 import Button from 'primevue/button';
 
 import { Game } from '@shared/types';
-import { useGamesStore, useMenuStore } from '@renderer/store';
+import { useGamesStore } from '@renderer/store';
 import { randomColor } from '../utils';
+import GameMenu from './GameMenu.vue';
 
 const props = defineProps<HeroProps>();
 
 const gamesStore = useGamesStore();
-const menuStore = useMenuStore();
 
 const heroImage = computed(() => {
   if (props.game.hero) return `url(appdata://${props.game.hero})`;
@@ -62,10 +64,6 @@ const heroImage = computed(() => {
 
 const handlePlay = () => {
   gamesStore.launchGame(props.game);
-};
-
-const openMenu = (evt) => {
-  menuStore.openGameMenu(evt, props.game);
 };
 </script>
 

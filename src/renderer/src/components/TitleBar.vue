@@ -24,6 +24,8 @@ function handleClick(command: 'min' | 'max' | 'close'): void {
   justify-content: space-between;
   height: 1.5rem;
   background-color: var(--surface-card);
+  position: relative;
+  z-index: 99999;
 }
 .logo {
   margin-left: 0.125rem;

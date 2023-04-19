@@ -1,6 +1,6 @@
 <template>
   <TitleBar />
-  <div class="main">
+  <div id="main">
     <FirstStartPage v-if="firstStart" />
     <router-view v-else />
   </div>
@@ -16,7 +16,7 @@ const firstStart = useLocalStorage('firstStart', true);
 </script>
 
 <style scoped lang="postcss">
-.main {
+#main {
   overflow-y: overlay;
   overflow-x: hidden;
   flex: 1;

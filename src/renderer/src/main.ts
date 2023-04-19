@@ -12,6 +12,10 @@ import 'primevue/resources/themes/viva-dark/theme.css';
 import 'primevue/resources/primevue.min.css';
 import 'primeicons/primeicons.css';
 
+import '@fortawesome/fontawesome-free/css/fontawesome.css';
+import '@fortawesome/fontawesome-free/css/brands.css';
+import '@fortawesome/fontawesome-free/css/solid.css';
+
 import './firebase/index';
 
 import App from './App.vue';
