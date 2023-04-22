@@ -2,7 +2,7 @@
   <DataView :value="filteredGames" :layout="layout" data-key="all-games">
     <template #header>
       <div class="flex items-center">
-        <div class="flex-1">
+        <div class="flex flex-1 gap-2">
           <Button label="Filter" icon="pi pi-filter" @click="handleOpenFilterMenu" />
           <OverlayPanel ref="filterMenu">
             <div class="flex flex-col gap-2">
@@ -27,8 +27,27 @@
                 />
                 <label for="ubisoft" class="pl-2">Ubisoft</label>
               </div>
+              <div class="flex items-center">
+                <Checkbox
+                  v-model="launchersFilter"
+                  input-id="custom"
+                  name="custom"
+                  value="custom"
+                />
+                <label for="custom" class="pl-2">Custom</label>
+              </div>
             </div>
           </OverlayPanel>
+          <Button label="Add game" icon="pi pi-plus" text @click="addGameVisible = true" />
+          <Dialog
+            v-model:visible="addGameVisible"
+            modal
+            header="Add a new game"
+            dismissable-mask
+            style="min-width: 36rem"
+          >
+            <AddGameForm @close="addGameVisible = false" />
+          </Dialog>
         </div>
         <div class="p-input-filled w-1/3">
           <Input
@@ -60,14 +79,16 @@
           <span>{{ getLauncherName(slotProps.data.launcher) }}</span>
         </div>
         <div class="flex justify-end gap-1">
-          <Button label="Play" severity="info" raised rounded />
           <Button
-            icon="pi pi-ellipsis-h"
-            plain
-            text
+            label="Play"
+            severity="info"
+            raised
             rounded
-            @click="menuStore.openGameMenu($event, slotProps.data)"
+            @click="gamesStore.launchGame(slotProps.data)"
           />
+          <GameMenu v-slot="menuSlotProps" :game="slotProps.data">
+            <Button v-bind="menuSlotProps" icon="pi pi-ellipsis-h" plain text rounded />
+          </GameMenu>
         </div>
       </div>
     </template>
@@ -84,20 +105,23 @@ import DataViewLayoutOptions from 'primevue/dataviewlayoutoptions';
 import Button from 'primevue/button';
 import OverlayPanel from 'primevue/overlaypanel';
 import Checkbox from 'primevue/checkbox';
+import Dialog from 'primevue/dialog';
 
 import GameCard from '@renderer/components/GameCard.vue';
-import { useGamesStore, useMenuStore } from '@renderer/store';
+import { useGamesStore } from '@renderer/store';
 import Input from '@renderer/components/Input.vue';
 import { getLauncherName, getLauncherIcon } from '@renderer/utils';
 import { useLocalStorage } from '@vueuse/core';
+import GameMenu from '@renderer/components/GameMenu.vue';
+import AddGameForm from '@renderer/components/AddGameForm.vue';
 
 const layout = useLocalStorage<'grid' | 'list' | undefined>('gamesPageLayout', 'grid');
 const search = ref('');
 const filterMenu = ref();
-const launchersFilter = ref(['steam', 'epic', 'ea', 'ubisoft']);
+const launchersFilter = ref(['steam', 'epic', 'ea', 'ubisoft', 'custom']);
+const addGameVisible = ref(false);
 
 const gamesStore = useGamesStore();
-const menuStore = useMenuStore();
 
 const filteredGames = computed(() => {
   return gamesStore.games

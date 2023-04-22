@@ -43,5 +43,6 @@ const props = defineProps<InputProps>();
   display: flex;
   flex-direction: column;
   text-align: left;
+  width: 100%;
 }
 </style>

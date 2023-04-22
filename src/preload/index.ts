@@ -6,12 +6,13 @@ import { Game, LauncherPaths } from '@shared/types';
 export const api = {
   dialog: {
     openDirPicker: (): Promise<string> => ipcRenderer.invoke('dialog:open-dir'),
+    openFilePicker: (): Promise<string> => ipcRenderer.invoke('dialog:open-file'),
   },
   scanner: {
     paths: (): Promise<LauncherPaths> => ipcRenderer.invoke('games:paths'),
     games: (paths: LauncherPaths): Promise<Game[]> => ipcRenderer.invoke('games:all', paths),
-    launch: (gameId: string, launcher: string) =>
-      ipcRenderer.send('games:launch', gameId, launcher),
+    launch: (gameId: string, launcher: string, executable?: string) =>
+      ipcRenderer.send('games:launch', gameId, launcher, executable),
   },
 };
 

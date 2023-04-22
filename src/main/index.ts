@@ -95,7 +95,7 @@ import { exec, spawn } from 'child_process';
 
 import { GameScanner } from './scanner/GameScanner';
 import { Game, LauncherPaths } from '@shared/types';
-import { openDirPicker } from './dialog';
+import { openDirPicker, openFilePicker } from './dialog';
 
 const gameScanner = new GameScanner();
 ipcMain.handle('games:paths', gameScanner.getPaths);
@@ -104,19 +104,26 @@ ipcMain.handle('games:all', async (_: IpcMainInvokeEvent, paths: LauncherPaths) 
   const games = await gameScanner.scan();
   return games.sort((a, b) => (a.name > b.name ? 1 : b.name > a.name ? -1 : 0));
 });
-ipcMain.on('games:launch', (_: IpcMainInvokeEvent, gameId: string, launcher: string) => {
-  let command;
-  switch (launcher) {
-    case 'steam':
-      command = `start "" "steam://rungameid/${gameId}"`;
-      break;
-    case 'epic':
-      command = `start "" "com.epicgames.launcher://apps/${gameId}?action=launch&silent=true"`;
-      break;
-    default:
-      throw new Error('Invalid launcher');
+ipcMain.on(
+  'games:launch',
+  (_: IpcMainInvokeEvent, gameId: string, launcher: string, executable?: string) => {
+    let command = '';
+    switch (launcher) {
+      case 'steam':
+        command = `start "" "steam://rungameid/${gameId}"`;
+        break;
+      case 'epic':
+        command = `start "" "com.epicgames.launcher://apps/${gameId}?action=launch&silent=true"`;
+        break;
+      case 'custom':
+        if (executable) command = `start "" "${executable}"`;
+        break;
+      default:
+        throw new Error('Game launcher is invalid or not implemented.');
+    }
+    exec(command);
   }
-  exec(command);
-});
+);
 
 ipcMain.handle('dialog:open-dir', openDirPicker);
+ipcMain.handle('dialog:open-file', openFilePicker);

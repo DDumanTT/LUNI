@@ -1,9 +1,11 @@
 import { computed, ref } from 'vue';
 import { defineStore } from 'pinia';
+import { updateCurrentUserProfile, useCurrentUser, useFirebaseAuth } from 'vuefire';
 import { useLocalStorage } from '@vueuse/core';
 import { MenuItem } from 'primevue/menuitem';
 import { PrimeIcons } from 'primevue/api';
 import { useToast } from 'primevue/usetoast';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 
 import { Game, LauncherPaths } from '@shared/types';
 
@@ -22,6 +24,7 @@ export const useGamesStore = defineStore('games', () => {
   const games = useLocalStorage<Game[]>('games', []);
   const recentGamesIds = useLocalStorage<string[]>('recentGamesIds', []);
   const favGamesIds = useLocalStorage<string[]>('favGamesIds', []);
+  const customGamesCount = ref(0);
 
   const toast = useToast();
 
@@ -93,7 +96,7 @@ export const useGamesStore = defineStore('games', () => {
     });
     timeout = setTimeout(() => {
       addRecent(game.id);
-      window.api.scanner.launch(game.id, game.launcher);
+      window.api.scanner.launch(game.id, game.launcher, game.executable);
       timeout = undefined;
     }, LAUNCH_TIMEOUT);
   }
@@ -106,7 +109,33 @@ export const useGamesStore = defineStore('games', () => {
     timeout = undefined;
   }
 
-  return { games, recentGames, favoriteGames, addRecent, toggleFavorite, launchGame, cancelLaunch };
+  /**
+   * Adds a new custom game
+   * @param game custom game
+   */
+  const addCustomGame = (
+    game: Pick<Game, 'name' | 'executable' | 'cover' | 'hero' | 'icon' | 'logo'>
+  ) => {
+    const customGame = {
+      ...game,
+      id: 'custom' + customGamesCount.value,
+      launcher: 'custom',
+      isFavorite: false,
+      path: game.executable,
+    } as Game;
+    games.value.push(customGame);
+  };
+
+  return {
+    games,
+    recentGames,
+    favoriteGames,
+    addRecent,
+    toggleFavorite,
+    launchGame,
+    cancelLaunch,
+    addCustomGame,
+  };
 });
 
 export const useMenuStore = defineStore('menuStore', () => {
@@ -191,4 +220,31 @@ export const useMenuStore = defineStore('menuStore', () => {
     setMenu,
     setContextMenu,
   };
+});
+
+interface UserInfo {
+  displayName?: string;
+  photoURL?: string;
+}
+
+export const useAuthStore = defineStore('authStore', () => {
+  const auth = useFirebaseAuth()!;
+  const user = useCurrentUser();
+
+  const isUserLoaded = computed(() => user.value !== undefined);
+
+  const signIn = (email: string, password: string) =>
+    signInWithEmailAndPassword(auth, email, password);
+
+  const signOut = () => auth.signOut();
+
+  const createAccount = async (username: string, email: string, password: string) => {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    await updateAccount({ displayName: username });
+    return userCredential;
+  };
+
+  const updateAccount = (userInfo: UserInfo) => updateCurrentUserProfile(userInfo);
+
+  return { auth, user, isUserLoaded, signIn, signOut, createAccount, updateAccount };
 });

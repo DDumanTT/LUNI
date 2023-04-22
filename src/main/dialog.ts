@@ -8,4 +8,12 @@ async function openDirPicker() {
   return filePaths[0];
 }
 
-export { openDirPicker };
+async function openFilePicker() {
+  const { canceled, filePaths } = await dialog.showOpenDialog({
+    properties: ['openFile'],
+  });
+  if (canceled) return;
+  return filePaths[0];
+}
+
+export { openDirPicker, openFilePicker };

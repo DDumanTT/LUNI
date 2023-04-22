@@ -1,5 +1,6 @@
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
+import { VueFire, VueFireAuth } from 'vuefire';
 import PrimeVue from 'primevue/config';
 import ToastService from 'primevue/toastservice';
 import 'swiper/css';
@@ -20,6 +21,7 @@ import './firebase/index';
 
 import App from './App.vue';
 import router from './routes/router';
+import { firebaseApp } from './firebase/index';
 
 const pinia = createPinia();
 const app = createApp(App);
@@ -28,4 +30,9 @@ app.use(router);
 app.use(pinia);
 app.use(PrimeVue);
 app.use(ToastService);
+app.use(VueFire, {
+  firebaseApp,
+  modules: [VueFireAuth()],
+});
+
 app.mount('#app');

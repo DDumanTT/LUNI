@@ -31,6 +31,7 @@ export const getLauncherName = (name: string) =>
     epic: 'Epic Games',
     ea: 'Electronic Arts',
     ubisoft: 'Ubisoft',
+    custom: 'Custom',
   }[name]);
 
 export const getLauncherIcon = (name: string) =>
@@ -40,3 +41,5 @@ export const getLauncherIcon = (name: string) =>
     ea: 'pi-ea',
     ubisoft: 'pi-ubisoft',
   }[name]);
+
+export const validateEmail = (email) => /^\S+@\S+\.\S+$/.test(email);

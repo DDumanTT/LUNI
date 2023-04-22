@@ -2,7 +2,28 @@
   <nav class="nav-wrapper">
     <div class="users">
       <span class="ml-1">
-        <Button label="Sign In" rounded outlined />
+        <template v-if="!authStore.user">
+          <Button
+            label="Sign In"
+            icon="pi pi-sign-in"
+            rounded
+            outlined
+            @click="signInVisible = true"
+          />
+          <SignInModal v-model:visible="signInVisible" @close="signInVisible = false" />
+          <Dialog v-model:visible="editProfileVisible" header="Edit profile">
+            <ProfileEditForm />
+          </Dialog>
+        </template>
+        <template v-else>
+          <Avatar
+            :label="authStore.user.displayName?.[0]"
+            shape="circle"
+            class="avatar"
+            @click="toggleMenu"
+          />
+          {{ authStore.user.displayName }}
+        </template>
       </span>
     </div>
     <div class="nav-tabs">
@@ -11,15 +32,27 @@
     <div class="settings">
       <Button class="mr-1" icon="pi pi-cog" plain text rounded />
     </div>
+    <Menu ref="menu" :model="menuItems" :popup="true" />
   </nav>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import TabMenu from 'primevue/tabmenu';
 import { MenuItem } from 'primevue/menuitem';
 import Button from 'primevue/button';
+import Avatar from 'primevue/avatar';
 
+import SignInModal from './SignInModal.vue';
+import { useAuthStore } from '@renderer/store';
+import { randomColor } from '@renderer/utils';
+import Menu from 'primevue/menu';
+
+const authStore = useAuthStore();
+
+const menu = ref();
+const signInVisible = ref(false);
+const editProfileVisible = ref(false);
 const items = ref<MenuItem[]>([
   {
     label: 'Home',
@@ -37,6 +70,24 @@ const items = ref<MenuItem[]>([
     to: '/friends',
   },
 ]);
+
+const avatarColor = computed(() => `--${randomColor()}-500`);
+
+const menuItems = ref([
+  {
+    label: 'Edit profile',
+    icon: 'pi pi-user-edit',
+    command: () => {},
+  },
+  { separator: true },
+  {
+    label: 'Logout',
+    icon: 'pi pi-sign-out',
+    command: authStore.signOut,
+  },
+]);
+
+const toggleMenu = (event) => menu.value.toggle(event);
 </script>
 
 <style scoped lang="postcss">
@@ -69,5 +120,9 @@ const items = ref<MenuItem[]>([
 }
 :deep(.p-tabmenu .p-tabmenu-nav .p-tabmenuitem .p-menuitem-link) {
   background: transparent;
+}
+.avatar {
+  background-color: v-bind('`var(${avatarColor})`');
+  cursor: pointer;
 }
 </style>

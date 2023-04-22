@@ -1,8 +1,7 @@
 import { initializeApp } from 'firebase/app';
 import { getAnalytics } from 'firebase/analytics';
-import { getFirestore, collection } from 'firebase/firestore';
-
-console.log(import.meta.env);
+import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
+import { getAuth, connectAuthEmulator } from 'firebase/auth';
 
 const firebaseConfig = {
   apiKey: import.meta.env.RENDERER_VITE_FIREBASE_CONFIG_API_KEY,
@@ -17,5 +16,10 @@ const firebaseConfig = {
 const firebaseApp = initializeApp(firebaseConfig);
 const analytics = getAnalytics(firebaseApp);
 const db = getFirestore(firebaseApp);
+const auth = getAuth(firebaseApp);
 
-export { firebaseApp, db, analytics };
+// connect to emulators
+// connectFirestoreEmulator(db, 'localhost', 8080);
+// connectAuthEmulator(auth, 'http://localhost:9099');
+
+export { firebaseApp, db, analytics, auth };
