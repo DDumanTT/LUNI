@@ -6,7 +6,7 @@ import GamesPage from './GamesPage.vue';
 import FriendsPage from './FriendsPage.vue';
 import ErrorPage from './ErrorPage.vue';
 
-export default createRouter({
+const router = createRouter({
   history: createMemoryHistory(),
   routes: [
     {
@@ -22,3 +22,5 @@ export default createRouter({
     { path: '/:pathMatch(.*)*', component: ErrorPage },
   ],
 });
+
+export default router;

@@ -86,7 +86,6 @@ import Button from 'primevue/button';
 
 import Input from './Input.vue';
 import { useGamesStore } from '@renderer/store';
-import { emit } from 'process';
 
 const emit = defineEmits(['close']);
 

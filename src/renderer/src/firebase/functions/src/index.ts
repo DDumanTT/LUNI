@@ -1,7 +1,10 @@
 import * as functions from "firebase-functions";
+import * as admin from "firebase-admin";
 import {Apicalypse} from "apicalypse";
 import axios from "axios";
 import igdb from "igdb-api-node";
+
+admin.initializeApp();
 
 interface AuthResp {
   access_token: string;
@@ -70,3 +73,11 @@ export const getGameData = functions.region("europe-west1")
         (a.category - b.category) ||
         Object.keys(b).length - Object.keys(a).length)[0];
   });
+
+export const onUserCreated = functions.auth.user().onCreate((user) => {
+  const {uid, email, displayName} = user;
+  return admin.firestore().collection("users").doc(uid).set({
+    email,
+    displayName,
+  });
+});

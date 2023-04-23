@@ -1,13 +1,17 @@
 import { computed, ref } from 'vue';
 import { defineStore } from 'pinia';
-import { updateCurrentUserProfile, useCurrentUser, useFirebaseAuth } from 'vuefire';
+import { updateCurrentUserProfile, useCurrentUser, useFirebaseAuth, useCollection } from 'vuefire';
 import { useLocalStorage } from '@vueuse/core';
-import { MenuItem } from 'primevue/menuitem';
-import { PrimeIcons } from 'primevue/api';
 import { useToast } from 'primevue/usetoast';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import {
+  UserInfo,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from 'firebase/auth';
+import { addDoc, collection, doc, setDoc, serverTimestamp } from 'firebase/firestore';
 
 import { Game, LauncherPaths } from '@shared/types';
+import { db } from './firebase';
 
 export const firstStart = useLocalStorage('firstStart', true);
 
@@ -138,91 +142,46 @@ export const useGamesStore = defineStore('games', () => {
   };
 });
 
-export const useMenuStore = defineStore('menuStore', () => {
-  const gamesStore = useGamesStore();
+export const useChatStore = defineStore('chatStore', () => {
+  const users = useCollection<UserInfo>(collection(db, 'users'));
+  const chats = useCollection(collection(db, 'chats'));
+  const user = useCurrentUser();
 
-  const contextMenu = ref();
-  const menu = ref();
-  const items = ref<MenuItem[]>([]);
-  const modalVisible = ref(false);
-  // const modalComponent = ref('');
-  // const modalProps = ref({});
-
-  const menuGame = ref<Game>();
-
-  const gameMenuItems = computed(() => {
-    if (!menuGame.value) return [];
-    return [
-      {
-        label: menuGame.value.name,
-        items: [
-          {
-            label: 'Play',
-            icon: PrimeIcons.PLAY,
-            command: () => {
-              if (menuGame.value) gamesStore.launchGame(menuGame.value);
-            },
-          },
-          {
-            label: menuGame.value.isFavorite ? 'Unfavorite' : 'Favorite',
-            icon: menuGame.value.isFavorite ? PrimeIcons.HEART_FILL : PrimeIcons.HEART,
-            command: () => {
-              if (menuGame.value) gamesStore.toggleFavorite(menuGame.value.id);
-            },
-          },
-          {
-            label: 'Information',
-            icon: PrimeIcons.INFO_CIRCLE,
-          },
-          {
-            label: 'Settings',
-            icon: PrimeIcons.COG,
-            command: () => {},
-          },
-        ],
+  const sendMessage = async (recipientUid: string, message: string) => {
+    if (!user.value) return;
+    const recipient = users.value.find((user) => user.uid === recipientUid);
+    if (!recipient) throw new Error('Recipient not found');
+    let user1: UserInfo, user2: UserInfo;
+    if (user.value?.uid < recipientUid) {
+      user1 = user.value;
+      user2 = recipient;
+    } else {
+      user1 = recipient;
+      user2 = user.value;
+    }
+    await setDoc(doc(db, 'chats', user1.uid + '-' + user2.uid), {
+      user1: {
+        uid: user1.uid,
+        displayName: user1.displayName,
+        photoURL: user1.photoURL,
       },
-    ];
-  });
-
-  const openGameMenu = (evt, game: Game) => {
-    menuGame.value = game;
-    items.value = gameMenuItems.value;
-    contextMenu.value.hide();
-    menu.value.toggle(evt);
+      user2: {
+        uid: user2.uid,
+        displayName: user2.displayName,
+        photoURL: user2.photoURL,
+      },
+    });
+    return addDoc(collection(db, 'chats', user1.uid + '-' + user2.uid, 'messages'), {
+      sender: user.value.uid,
+      createdAt: serverTimestamp(),
+      message,
+    });
   };
 
-  const openGameContextMenu = (evt, game: Game) => {
-    menuGame.value = game;
-    items.value = gameMenuItems.value;
-    menu.value.hide();
-    contextMenu.value.show(evt);
-  };
-
-  // const openGameInfoModal = (game: Game) => {
-  //   modalVisible.value = true;
-  //   modalComponent.value = 'GameInfo';
-  // };
-
-  const setMenu = (element) => {
-    menu.value = element;
-  };
-  const setContextMenu = (element) => {
-    contextMenu.value = element;
-  };
-
-  return {
-    items,
-    modalVisible,
-    // modalComponent,
-    openGameMenu,
-    openGameContextMenu,
-    // openGameInfoModal,
-    setMenu,
-    setContextMenu,
-  };
+  return { users, chats, sendMessage };
 });
 
-interface UserInfo {
+interface UserUpdateInfo {
   displayName?: string;
   photoURL?: string;
 }
@@ -230,6 +189,8 @@ interface UserInfo {
 export const useAuthStore = defineStore('authStore', () => {
   const auth = useFirebaseAuth()!;
   const user = useCurrentUser();
+
+  // const users = useCollection(collection(db, 'users'));
 
   const isUserLoaded = computed(() => user.value !== undefined);
 
@@ -240,11 +201,19 @@ export const useAuthStore = defineStore('authStore', () => {
 
   const createAccount = async (username: string, email: string, password: string) => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    await updateAccount({ displayName: username });
+    const { uid, photoURL } = userCredential.user;
+    const update = updateAccount({ displayName: username });
+    const addToDb = setDoc(doc(db, 'users', userCredential.user.uid), {
+      displayName: username,
+      uid,
+      email,
+      photoURL,
+    });
+    await Promise.all([update, addToDb]);
     return userCredential;
   };
 
-  const updateAccount = (userInfo: UserInfo) => updateCurrentUserProfile(userInfo);
+  const updateAccount = (userInfo: UserUpdateInfo) => updateCurrentUserProfile(userInfo);
 
   return { auth, user, isUserLoaded, signIn, signOut, createAccount, updateAccount };
 });
