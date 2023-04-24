@@ -1,3 +1,5 @@
+import { UserInfo } from 'firebase/auth';
+
 export type LauncherPaths = {
   [key: string]: string;
   steam: string;
@@ -113,3 +115,7 @@ interface LanguageSupports {
   language: Language;
   language_support_type: LanguageSupportType;
 }
+
+// interface User extends UserInfo {
+
+// }

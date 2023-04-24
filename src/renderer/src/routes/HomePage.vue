@@ -25,13 +25,13 @@ import { computed, ref } from 'vue';
 import Panel from 'primevue/panel';
 import Button from 'primevue/button';
 
-import { firstStart, useGamesStore } from '@renderer/store';
+import { firstStart, useFriendsStore, useGamesStore } from '@renderer/store';
 import Hero from '@renderer/components/Hero.vue';
 import { getRandomIndex } from '@renderer/utils';
 import GameSlider from '@renderer/components/GameSlider.vue';
-import { getGameData } from '@renderer/firebase/functions';
 
 const gamesStore = useGamesStore();
+const friendsStore = useFriendsStore();
 
 const heroGameIndex = ref(getRandomIndex(gamesStore.games));
 
@@ -39,8 +39,8 @@ const recent = computed(() =>
   gamesStore.recentGames.filter((game) => game.id !== gamesStore.games[heroGameIndex.value].id)
 );
 
-const handleTest = async () => {
-  console.log(await getGameData({ game: 'jump king' }));
+const handleTest = () => {
+  console.log(friendsStore.user?.displayName);
 };
 </script>
 

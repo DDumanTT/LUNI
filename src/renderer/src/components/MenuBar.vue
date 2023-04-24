@@ -17,7 +17,8 @@
         </template>
         <template v-else>
           <Avatar
-            :label="authStore.user.displayName?.[0]"
+            v-badge.success="friendsStore.receivedRequests.length"
+            :label="authStore.user.displayName?.[0] || authStore.user.email!"
             shape="circle"
             class="avatar"
             @click="toggleMenu"
@@ -32,7 +33,20 @@
     <div class="settings">
       <Button class="mr-1" icon="pi pi-cog" plain text rounded />
     </div>
-    <Menu ref="menu" :model="menuItems" :popup="true" />
+    <Menu ref="menu" :model="menuItems" :popup="true">
+      <template #item="slotProps">
+        <a class="p-menuitem-link !h-10" tabindex="-1">
+          <span :class="['p-menuitem-icon', slotProps.item.icon]" />
+          <span class="p-menuitem-text">{{ slotProps.item.label }}</span>
+          <Badge
+            v-if="slotProps.item.badge"
+            :value="slotProps.item.badge"
+            severity="success"
+            class="ml-auto"
+          />
+        </a>
+      </template>
+    </Menu>
   </nav>
 </template>
 
@@ -42,18 +56,20 @@ import TabMenu from 'primevue/tabmenu';
 import { MenuItem } from 'primevue/menuitem';
 import Button from 'primevue/button';
 import Avatar from 'primevue/avatar';
+import Badge from 'primevue/badge';
 
 import SignInModal from './SignInModal.vue';
-import { useAuthStore } from '@renderer/store';
+import { useAuthStore, useFriendsStore } from '@renderer/store';
 import { randomColor } from '@renderer/utils';
 import Menu from 'primevue/menu';
 
 const authStore = useAuthStore();
+const friendsStore = useFriendsStore();
 
 const menu = ref();
 const signInVisible = ref(false);
 const editProfileVisible = ref(false);
-const items = ref<MenuItem[]>([
+const items = computed<MenuItem[]>(() => [
   {
     label: 'Home',
     icon: 'pi pi-fw pi-home',
@@ -73,7 +89,15 @@ const items = ref<MenuItem[]>([
 
 const avatarColor = computed(() => `--${randomColor()}-500`);
 
-const menuItems = ref([
+const menuItems = computed(() => [
+  {
+    label: 'Alerts',
+    icon: 'pi pi-bell',
+    command: () => {
+      console.log('open alerts modal');
+    },
+    badge: friendsStore.receivedRequests.length,
+  },
   {
     label: 'Edit profile',
     icon: 'pi pi-user-edit',
@@ -124,5 +148,8 @@ const toggleMenu = (event) => menu.value.toggle(event);
 .avatar {
   background-color: v-bind('`var(${avatarColor})`');
   cursor: pointer;
+  :deep(.p-badge) {
+    display: v-bind('!friendsStore.receivedRequests.length ? "none" : "inline-block"');
+  }
 }
 </style>

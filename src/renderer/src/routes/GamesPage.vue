@@ -146,10 +146,4 @@ const handleOpenFilterMenu = (evt) => {
 :deep(.p-dataview-content) {
   background: transparent;
 }
-.games-grid {
-  margin: 2rem;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 3rem;
-}
 </style>

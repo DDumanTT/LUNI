@@ -1,4 +1,4 @@
-import { computed, ref } from 'vue';
+import { computed, ref, unref } from 'vue';
 import { defineStore } from 'pinia';
 import { updateCurrentUserProfile, useCurrentUser, useFirebaseAuth, useCollection } from 'vuefire';
 import { useLocalStorage } from '@vueuse/core';
@@ -8,7 +8,16 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
 } from 'firebase/auth';
-import { addDoc, collection, doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import {
+  addDoc,
+  collection,
+  doc,
+  setDoc,
+  serverTimestamp,
+  deleteDoc,
+  runTransaction,
+  writeBatch,
+} from 'firebase/firestore';
 
 import { Game, LauncherPaths } from '@shared/types';
 import { db } from './firebase';
@@ -143,9 +152,11 @@ export const useGamesStore = defineStore('games', () => {
 });
 
 export const useChatStore = defineStore('chatStore', () => {
-  const users = useCollection<UserInfo>(collection(db, 'users'));
-  const chats = useCollection(collection(db, 'chats'));
+  const usersRef = collection(db, 'users');
+
   const user = useCurrentUser();
+  const users = useCollection<UserInfo>(usersRef);
+  const chats = useCollection(collection(db, 'chats'));
 
   const sendMessage = async (recipientUid: string, message: string) => {
     if (!user.value) return;
@@ -179,6 +190,113 @@ export const useChatStore = defineStore('chatStore', () => {
   };
 
   return { users, chats, sendMessage };
+});
+
+export const useFriendsStore = defineStore('friendsStore', () => {
+  const user = useCurrentUser();
+
+  const ownFriendsCollection = computed(
+    () => user.value && collection(db, 'users', user.value.uid, 'friends')
+  );
+  const ownSentCollection = computed(
+    () => user.value && collection(db, 'users', user.value.uid, 'sentRequests')
+  );
+  const ownReceivedCollection = computed(
+    () => user.value && collection(db, 'users', user.value.uid, 'receivedRequests')
+  );
+  const friendsCollection = (uid: string) => collection(db, 'users', uid, 'friends');
+  const sentCollection = (uid: string) => collection(db, 'users', uid, 'sentRequests');
+  const receivedCollection = (uid: string) => collection(db, 'users', uid, 'receivedRequests');
+
+  const chatStore = useChatStore();
+  const friends = useCollection<UserInfo>(ownFriendsCollection);
+  const sentRequests = useCollection<UserInfo>(ownSentCollection);
+  const receivedRequests = useCollection<UserInfo>(ownReceivedCollection);
+
+  const friendUids = computed(() => friends.value.map((user) => user.uid));
+  const sentUids = computed(() => sentRequests.value.map((user) => user.uid));
+
+  const users = computed(() =>
+    chatStore.users
+      .filter((u) => u.uid !== user.value?.uid)
+      .map((u) => ({
+        ...u,
+        isFriend: friendUids.value.includes(u.uid),
+        requestSent: sentUids.value.includes(u.uid),
+      }))
+  );
+
+  const userMap = (user: UserInfo) => ({
+    uid: user.uid,
+    email: user.email,
+    displayName: user.displayName,
+    photoURL: user.photoURL,
+  });
+
+  const sendRequest = async (uid: string) => {
+    if (!user.value || !ownSentCollection.value) return;
+    const otherUser = chatStore.users.find((user) => user.uid === uid);
+    if (!otherUser) return;
+    const batch = writeBatch(db);
+    batch.set(doc(ownSentCollection.value, otherUser.uid), otherUser);
+    batch.set(doc(receivedCollection(uid), user.value.uid), userMap(user.value));
+    return batch.commit();
+  };
+
+  const cancelRequest = async (uid: string) => {
+    if (!user.value || !ownSentCollection.value) return;
+    const otherUser = sentRequests.value.find((user) => user.uid === uid);
+    if (!otherUser) return;
+    const batch = writeBatch(db);
+    batch.delete(doc(ownSentCollection.value, uid));
+    batch.delete(doc(receivedCollection(uid), user.value.uid));
+    return batch.commit();
+  };
+
+  const acceptRequest = async (uid: string) => {
+    if (!user.value || !ownReceivedCollection.value || !ownFriendsCollection.value) return;
+    const otherUser = receivedRequests.value.find((user) => user.uid === uid);
+    if (!otherUser) return;
+    const batch = writeBatch(db);
+    batch.delete(doc(sentCollection(uid), user.value.uid));
+    batch.delete(doc(ownReceivedCollection.value, uid));
+    batch.set(doc(friendsCollection(uid), user.value.uid), userMap(user.value));
+    batch.set(doc(ownFriendsCollection.value, uid), otherUser);
+    return batch.commit();
+  };
+
+  const denyRequest = async (uid: string) => {
+    if (!user.value || !ownReceivedCollection.value) return;
+    const otherUser = receivedRequests.value.find((user) => user.uid === uid);
+    if (!otherUser) return;
+    const batch = writeBatch(db);
+    batch.delete(doc(sentCollection(uid), user.value.uid));
+    batch.delete(doc(ownReceivedCollection.value, uid));
+    return batch.commit();
+  };
+
+  const unfriend = async (uid: string) => {
+    if (!user.value || !ownFriendsCollection.value) return;
+    const otherUser = receivedRequests.value.find((user) => user.uid === uid);
+    if (!otherUser) return;
+    const batch = writeBatch(db);
+    batch.delete(doc(ownFriendsCollection.value, uid));
+    batch.delete(doc(friendsCollection(uid), user.value.uid));
+    return batch.commit();
+  };
+
+  return {
+    user,
+    users,
+    friends,
+    sentRequests,
+    receivedRequests,
+    sendRequest,
+    cancelRequest,
+    acceptRequest,
+    denyRequest,
+    unfriend,
+  };
 });
 
 interface UserUpdateInfo {

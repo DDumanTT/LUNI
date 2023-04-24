@@ -3,6 +3,7 @@ import { createPinia } from 'pinia';
 import { VueFire, VueFireAuth } from 'vuefire';
 import PrimeVue from 'primevue/config';
 import ToastService from 'primevue/toastservice';
+import BadgeDirective from 'primevue/badgedirective';
 import 'swiper/css';
 import 'swiper/css/scrollbar';
 import 'atropos/css';
@@ -34,5 +35,7 @@ app.use(VueFire, {
   firebaseApp,
   modules: [VueFireAuth()],
 });
+
+app.directive('badge', BadgeDirective);
 
 app.mount('#app');
