@@ -19,9 +19,15 @@
         @click="handleAddFriend"
       />
       <div>
-        <Button icon="pi pi-comment" severity="help" />
+        <Button
+          icon="pi pi-comment"
+          severity="help"
+          :disabled="!user.isFriend"
+          @click="chatOpen = true"
+        />
       </div>
     </div>
+    <ChatModal v-model:visible="chatOpen" :user="props.user" />
   </div>
 </template>
 
@@ -36,7 +42,7 @@ interface UserCardProps {
 </script>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { UserInfo } from 'firebase/auth';
 import Avatar from 'primevue/avatar';
 import Button from 'primevue/button';
@@ -44,17 +50,20 @@ import Tag from 'primevue/tag';
 
 import { randomColor } from '@renderer/utils';
 import { useFriendsStore } from '@renderer/store';
+import ChatModal from './ChatModal.vue';
 
 const props = defineProps<UserCardProps>();
 
 const friendsStore = useFriendsStore();
 
+const chatOpen = ref(false);
+
 const avatarColor = computed(() => `--${randomColor()}-500`);
 
-const handleAddFriend = () => {
-  if (props.user.isFriend) friendsStore.unfriend(props.user.uid);
-  else if (props.user.requestSent) friendsStore.cancelRequest(props.user.uid);
-  else friendsStore.sendRequest(props.user.uid);
+const handleAddFriend = async () => {
+  if (props.user.isFriend) await friendsStore.unfriend(props.user.uid);
+  else if (props.user.requestSent) await friendsStore.cancelRequest(props.user.uid);
+  else await friendsStore.sendRequest(props.user.uid);
 };
 </script>
 

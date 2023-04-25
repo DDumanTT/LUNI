@@ -17,7 +17,7 @@
       </div>
     </template>
     <template #grid="slotProps">
-      <UserCard :user="slotProps.data" :is-friend="true" />
+      <UserCard :user="slotProps.data" />
     </template>
     <template #empty>
       <h3 class="text-xl">No friends found</h3>
@@ -74,12 +74,14 @@ const filteredUsers = computed(() =>
   )
 );
 const filteredFriends = computed(() =>
-  friendsStore.friends.filter(
-    (friend) =>
-      friendSearch.value === '' ||
-      friend.displayName?.toLowerCase().includes(friendSearch.value.toLowerCase()) ||
-      friend.email!.toLowerCase().includes(friendSearch.value.toLowerCase())
-  )
+  friendsStore.friends
+    .filter(
+      (friend) =>
+        friendSearch.value === '' ||
+        friend.displayName?.toLowerCase().includes(friendSearch.value.toLowerCase()) ||
+        friend.email!.toLowerCase().includes(friendSearch.value.toLowerCase())
+    )
+    .map((friend) => ({ ...friend, isFriend: true }))
 );
 </script>
 

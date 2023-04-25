@@ -16,7 +16,6 @@
     <h2 class="text-4xl">No games imported</h2>
     <Button severity="info" label="Import" outlined @click="firstStart = true" />
   </div>
-  <Button label="click" @click="handleTest" />
   <div class="h-[2000px]"></div>
 </template>
 
@@ -25,23 +24,18 @@ import { computed, ref } from 'vue';
 import Panel from 'primevue/panel';
 import Button from 'primevue/button';
 
-import { firstStart, useFriendsStore, useGamesStore } from '@renderer/store';
+import { firstStart, useGamesStore } from '@renderer/store';
 import Hero from '@renderer/components/Hero.vue';
 import { getRandomIndex } from '@renderer/utils';
 import GameSlider from '@renderer/components/GameSlider.vue';
 
 const gamesStore = useGamesStore();
-const friendsStore = useFriendsStore();
 
 const heroGameIndex = ref(getRandomIndex(gamesStore.games));
 
 const recent = computed(() =>
   gamesStore.recentGames.filter((game) => game.id !== gamesStore.games[heroGameIndex.value].id)
 );
-
-const handleTest = () => {
-  console.log(friendsStore.user?.displayName);
-};
 </script>
 
 <style lang="postcss" scoped>

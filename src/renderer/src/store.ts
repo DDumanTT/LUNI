@@ -97,14 +97,12 @@ export const useGamesStore = defineStore('games', () => {
         severity: 'error',
         summary: 'You are already launching a game.',
         detail: 'Cancel it to continue.',
-        group: 'launch',
         life: LAUNCH_TIMEOUT,
       });
     toast.add({
       severity: 'success',
       summary: 'Launching game...',
       detail: `${game.name} launching in 3 seconds. Close message to cancel.`,
-      group: 'launch',
       life: LAUNCH_TIMEOUT,
     });
     timeout = setTimeout(() => {
@@ -158,7 +156,21 @@ export const useChatStore = defineStore('chatStore', () => {
   const users = useCollection<UserInfo>(usersRef);
   const chats = useCollection(collection(db, 'chats'));
 
+  const getMessagesCollection = (uid: string) => {
+    if (!user.value) return;
+    let uid1: string, uid2: string;
+    if (user.value?.uid < uid) {
+      uid1 = user.value?.uid;
+      uid2 = uid;
+    } else {
+      uid1 = uid;
+      uid2 = user.value?.uid;
+    }
+    return collection(db, 'chats', uid1 + '-' + uid2, 'messages');
+  };
+
   const sendMessage = async (recipientUid: string, message: string) => {
+    if (!message) return;
     if (!user.value) return;
     const recipient = users.value.find((user) => user.uid === recipientUid);
     if (!recipient) throw new Error('Recipient not found');
@@ -185,11 +197,11 @@ export const useChatStore = defineStore('chatStore', () => {
     return addDoc(collection(db, 'chats', user1.uid + '-' + user2.uid, 'messages'), {
       sender: user.value.uid,
       createdAt: serverTimestamp(),
-      message,
+      text: message,
     });
   };
 
-  return { users, chats, sendMessage };
+  return { users, chats, getMessagesCollection, sendMessage };
 });
 
 export const useFriendsStore = defineStore('friendsStore', () => {
@@ -212,6 +224,8 @@ export const useFriendsStore = defineStore('friendsStore', () => {
   const friends = useCollection<UserInfo>(ownFriendsCollection);
   const sentRequests = useCollection<UserInfo>(ownSentCollection);
   const receivedRequests = useCollection<UserInfo>(ownReceivedCollection);
+
+  const toast = useToast();
 
   const friendUids = computed(() => friends.value.map((user) => user.uid));
   const sentUids = computed(() => sentRequests.value.map((user) => user.uid));
@@ -237,10 +251,12 @@ export const useFriendsStore = defineStore('friendsStore', () => {
     if (!user.value || !ownSentCollection.value) return;
     const otherUser = chatStore.users.find((user) => user.uid === uid);
     if (!otherUser) return;
+    if (receivedRequests.value.map((user) => user.uid).includes(uid)) return acceptRequest(uid);
     const batch = writeBatch(db);
     batch.set(doc(ownSentCollection.value, otherUser.uid), otherUser);
     batch.set(doc(receivedCollection(uid), user.value.uid), userMap(user.value));
-    return batch.commit();
+    await batch.commit();
+    toast.add({ severity: 'success', summary: 'Friend request sent', life: 3000 });
   };
 
   const cancelRequest = async (uid: string) => {
@@ -250,7 +266,8 @@ export const useFriendsStore = defineStore('friendsStore', () => {
     const batch = writeBatch(db);
     batch.delete(doc(ownSentCollection.value, uid));
     batch.delete(doc(receivedCollection(uid), user.value.uid));
-    return batch.commit();
+    await batch.commit();
+    toast.add({ severity: 'warn', summary: 'Friend request cancelled', life: 3000 });
   };
 
   const acceptRequest = async (uid: string) => {
@@ -262,7 +279,8 @@ export const useFriendsStore = defineStore('friendsStore', () => {
     batch.delete(doc(ownReceivedCollection.value, uid));
     batch.set(doc(friendsCollection(uid), user.value.uid), userMap(user.value));
     batch.set(doc(ownFriendsCollection.value, uid), otherUser);
-    return batch.commit();
+    await batch.commit();
+    toast.add({ severity: 'success', summary: 'Friend request accepted', life: 3000 });
   };
 
   const denyRequest = async (uid: string) => {
@@ -272,17 +290,19 @@ export const useFriendsStore = defineStore('friendsStore', () => {
     const batch = writeBatch(db);
     batch.delete(doc(sentCollection(uid), user.value.uid));
     batch.delete(doc(ownReceivedCollection.value, uid));
-    return batch.commit();
+    await batch.commit();
+    toast.add({ severity: 'warn', summary: 'Friend request denied', life: 3000 });
   };
 
   const unfriend = async (uid: string) => {
     if (!user.value || !ownFriendsCollection.value) return;
-    const otherUser = receivedRequests.value.find((user) => user.uid === uid);
+    const otherUser = friends.value.find((user) => user.uid === uid);
     if (!otherUser) return;
     const batch = writeBatch(db);
     batch.delete(doc(ownFriendsCollection.value, uid));
     batch.delete(doc(friendsCollection(uid), user.value.uid));
-    return batch.commit();
+    await batch.commit();
+    toast.add({ severity: 'warn', summary: 'Friend removed', life: 3000 });
   };
 
   return {

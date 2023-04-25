@@ -1,7 +1,7 @@
 <template>
   <MenuBar />
   <router-view />
-  <Toast class="!top-[90px]" group="launch" @close="gamesStore.cancelLaunch" />
+  <Toast class="!top-[90px]" @close="gamesStore.cancelLaunch" />
 </template>
 
 <script setup lang="ts">

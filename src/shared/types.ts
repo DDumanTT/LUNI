@@ -116,6 +116,11 @@ interface LanguageSupports {
   language_support_type: LanguageSupportType;
 }
 
-// interface User extends UserInfo {
-
-// }
+export interface Message {
+  text: string;
+  createdAt: {
+    seconds: number;
+    nanoseconds: number;
+  };
+  sender: string;
+}

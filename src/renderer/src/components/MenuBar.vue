@@ -11,9 +11,9 @@
             @click="signInVisible = true"
           />
           <SignInModal v-model:visible="signInVisible" @close="signInVisible = false" />
-          <Dialog v-model:visible="editProfileVisible" header="Edit profile">
+          <!-- <Dialog v-model:visible="editProfileVisible" header="Edit profile">
             <ProfileEditForm />
-          </Dialog>
+          </Dialog> -->
         </template>
         <template v-else>
           <Avatar
@@ -47,6 +47,7 @@
         </a>
       </template>
     </Menu>
+    <AlertsModal v-model:visible="alertsVisible" />
   </nav>
 </template>
 
@@ -62,6 +63,7 @@ import SignInModal from './SignInModal.vue';
 import { useAuthStore, useFriendsStore } from '@renderer/store';
 import { randomColor } from '@renderer/utils';
 import Menu from 'primevue/menu';
+import AlertsModal from './AlertsModal.vue';
 
 const authStore = useAuthStore();
 const friendsStore = useFriendsStore();
@@ -69,6 +71,7 @@ const friendsStore = useFriendsStore();
 const menu = ref();
 const signInVisible = ref(false);
 const editProfileVisible = ref(false);
+const alertsVisible = ref(false);
 const items = computed<MenuItem[]>(() => [
   {
     label: 'Home',
@@ -93,9 +96,7 @@ const menuItems = computed(() => [
   {
     label: 'Alerts',
     icon: 'pi pi-bell',
-    command: () => {
-      console.log('open alerts modal');
-    },
+    command: () => (alertsVisible.value = true),
     badge: friendsStore.receivedRequests.length,
   },
   {
