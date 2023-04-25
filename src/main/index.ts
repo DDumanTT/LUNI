@@ -91,10 +91,10 @@ app.on('window-all-closed', () => {
 
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.
-import { exec, spawn } from 'child_process';
+import { exec } from 'child_process';
 
 import { GameScanner } from './scanner/GameScanner';
-import { Game, LauncherPaths } from '@shared/types';
+import { LauncherPaths } from '@shared/types';
 import { openDirPicker, openFilePicker } from './dialog';
 
 const gameScanner = new GameScanner();

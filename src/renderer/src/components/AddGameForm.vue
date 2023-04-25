@@ -108,8 +108,9 @@ const error = ref({
   hero: '',
 });
 
-const handleSelectImage = async (field) => {
-  // TODO: implement image upload
+// TODO: implement image upload
+const handleSelectImage = async (field: string) => {
+  console.log(field);
 };
 const handleSelectGame = async () => {
   const path = await window.api.dialog.openFilePicker();

@@ -35,7 +35,7 @@ import InputText from 'primevue/inputtext';
 
 const emit = defineEmits(['click-left', 'click-right']);
 
-const props = defineProps<InputProps>();
+defineProps<InputProps>();
 </script>
 
 <style lang="postcss" scoped>

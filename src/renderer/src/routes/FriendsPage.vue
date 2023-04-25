@@ -51,16 +51,13 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import Button from 'primevue/button';
 import DataView from 'primevue/dataview';
 
-import { useAuthStore, useChatStore, useFriendsStore } from '@renderer/store';
+import { useFriendsStore } from '@renderer/store';
 import UserCard from '@renderer/components/UserCard.vue';
 import Input from '@renderer/components/Input.vue';
 
-const chatStore = useChatStore();
 const friendsStore = useFriendsStore();
-const authStore = useAuthStore();
 
 const userSearch = ref('');
 const friendSearch = ref('');

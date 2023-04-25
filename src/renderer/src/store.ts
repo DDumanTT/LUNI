@@ -1,4 +1,4 @@
-import { computed, ref, unref } from 'vue';
+import { computed, ref } from 'vue';
 import { defineStore } from 'pinia';
 import { updateCurrentUserProfile, useCurrentUser, useFirebaseAuth, useCollection } from 'vuefire';
 import { useLocalStorage } from '@vueuse/core';
@@ -8,16 +8,7 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
 } from 'firebase/auth';
-import {
-  addDoc,
-  collection,
-  doc,
-  setDoc,
-  serverTimestamp,
-  deleteDoc,
-  runTransaction,
-  writeBatch,
-} from 'firebase/firestore';
+import { addDoc, collection, doc, setDoc, serverTimestamp, writeBatch } from 'firebase/firestore';
 
 import { Game, LauncherPaths } from '@shared/types';
 import { db } from './firebase';

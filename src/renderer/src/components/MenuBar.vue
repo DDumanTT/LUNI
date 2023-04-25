@@ -70,7 +70,7 @@ const friendsStore = useFriendsStore();
 
 const menu = ref();
 const signInVisible = ref(false);
-const editProfileVisible = ref(false);
+// const editProfileVisible = ref(false);
 const alertsVisible = ref(false);
 const items = computed<MenuItem[]>(() => [
   {

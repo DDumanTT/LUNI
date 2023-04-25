@@ -1,6 +1,5 @@
-import { readdir, readFile, access, mkdir, copyFile } from 'node:fs/promises';
+import { readdir, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { app } from 'electron';
 import { enumerateValues, HKEY } from 'registry-js';
 
 import { Game } from '@shared/types';
@@ -9,7 +8,7 @@ import { Directory } from '../types';
 export default class Epic implements Directory<Game> {
   name: string;
   path: string;
-  private manifestsPath: string;
+  private manifestsPath = '';
 
   constructor(path?: string) {
     this.name = 'epic';
