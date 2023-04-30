@@ -3,7 +3,14 @@
     <label v-if="label" :for="id">{{ label }}</label>
     <span :class="{ 'p-input-icon-left': iconLeft, 'p-input-icon-right': iconRight }">
       <i v-if="iconLeft" :class="['pi', { [iconLeft]: iconLeft }]" @click="emit('click-left')" />
-      <InputText v-bind="$attrs" :id="id" class="w-full" :model-value="value" />
+      <component
+        :is="props.area ? Textarea : InputText"
+        :id="id"
+        auto-resize
+        v-bind="$attrs"
+        class="w-full"
+        :model-value="value"
+      />
       <i
         v-if="iconRight"
         :class="['pi', { [iconRight]: iconRight }]"
@@ -22,6 +29,7 @@ interface InputProps extends InputHTMLAttributes {
   label?: string;
   iconLeft?: string;
   iconRight?: string;
+  area?: boolean;
 }
 
 export default {
@@ -32,10 +40,11 @@ export default {
 <script setup lang="ts">
 import { InputHTMLAttributes } from 'vue';
 import InputText from 'primevue/inputtext';
+import Textarea from 'primevue/textarea';
 
 const emit = defineEmits(['click-left', 'click-right']);
 
-defineProps<InputProps>();
+const props = defineProps<InputProps>();
 </script>
 
 <style lang="postcss" scoped>

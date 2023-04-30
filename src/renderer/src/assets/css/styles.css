@@ -39,7 +39,6 @@ body,
 body {
   font-family: var(--font-family);
   color: var(--text-color-secondary);
-  background: radial-gradient(ellipse at top, var(--surface-card), var(--surface-ground));
 }
 
 #app {

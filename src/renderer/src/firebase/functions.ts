@@ -3,7 +3,7 @@ import { getFunctions, httpsCallable } from 'firebase/functions';
 
 const functions = getFunctions(firebaseApp);
 functions.region = 'europe-west1';
-// functions.customDomain = 'http://127.0.0.1:5001/luni-3c7aa/europe-west1';
+// connectFunctionsEmulator(functions, 'localhost', 5001);
 
 export const getGameData = (game: string) =>
   httpsCallable(functions, 'getGameData')({ game, fields: igdbFields });
@@ -41,3 +41,5 @@ const igdbFields = [
   'websites.url',
   'cover.image_id',
 ];
+
+export const getRecommendedUsers = httpsCallable(functions, 'getRecommendedFriends');

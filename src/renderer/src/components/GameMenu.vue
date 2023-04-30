@@ -8,6 +8,11 @@
     <Menu ref="menu" :model="menuItems" :popup="true" />
   </template>
   <GameInfoModal :game="props.game" :visible="modalVisible" @hide="modalVisible = false" />
+  <GameSettingsModal
+    v-model:visible="settingsVisible"
+    :game="props.game"
+    @close="settingsVisible = false"
+  />
 </template>
 
 <script lang="ts">
@@ -27,12 +32,14 @@ import { PrimeIcons } from 'primevue/api';
 import { Game } from '@shared/types';
 import { useGamesStore } from '@renderer/store';
 import GameInfoModal from './GameInfoModal.vue';
+import GameSettingsModal from './GameSettingsModal.vue';
 
 const store = useGamesStore();
 
 const props = withDefaults(defineProps<GameMenuProps>(), { context: false });
 
 const modalVisible = ref(false);
+const settingsVisible = ref(false);
 const menu = ref();
 const menuItems = computed<MenuItem[]>(() => [
   {
@@ -55,14 +62,12 @@ const menuItems = computed<MenuItem[]>(() => [
       {
         label: 'Information',
         icon: PrimeIcons.INFO_CIRCLE,
-        command: () => {
-          modalVisible.value = true;
-        },
+        command: () => (modalVisible.value = true),
       },
       {
         label: 'Settings',
         icon: PrimeIcons.COG,
-        command: () => {},
+        command: () => (settingsVisible.value = true),
       },
     ],
   },

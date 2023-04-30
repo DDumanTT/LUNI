@@ -87,7 +87,7 @@ const handleClickGame = (game: Game) => {
   text-align: center;
   font-family: PressStart2P, sans-serif;
   font-size: 1.5rem;
-  color: var(--text-color);
+  color: var(--bluegray-100);
   text-shadow: black 0px 0px 20px;
 }
 </style>

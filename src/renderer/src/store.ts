@@ -4,11 +4,22 @@ import { updateCurrentUserProfile, useCurrentUser, useFirebaseAuth, useCollectio
 import { useLocalStorage } from '@vueuse/core';
 import { useToast } from 'primevue/usetoast';
 import {
+  EmailAuthProvider,
   UserInfo,
   createUserWithEmailAndPassword,
+  reauthenticateWithCredential,
   signInWithEmailAndPassword,
+  updatePassword,
 } from 'firebase/auth';
-import { addDoc, collection, doc, setDoc, serverTimestamp, writeBatch } from 'firebase/firestore';
+import {
+  addDoc,
+  collection,
+  doc,
+  setDoc,
+  serverTimestamp,
+  writeBatch,
+  updateDoc,
+} from 'firebase/firestore';
 
 import { Game, LauncherPaths } from '@shared/types';
 import { db } from './firebase';
@@ -30,6 +41,7 @@ export const useGamesStore = defineStore('games', () => {
   const favGamesIds = useLocalStorage<string[]>('favGamesIds', []);
   const customGamesCount = ref(0);
 
+  const user = useCurrentUser();
   const toast = useToast();
 
   const recentGames = computed(() =>
@@ -74,6 +86,16 @@ export const useGamesStore = defineStore('games', () => {
     }
     game.isFavorite = true;
     favGamesIds.value.push(gameId);
+    return updateFavorites();
+  }
+
+  function updateFavorites() {
+    if (!user.value) return;
+    return updateDoc(doc(db, 'users', user.value.uid), {
+      favoriteGames: favGamesIds.value.map(
+        (id) => games.value.find((game) => game.id === id)?.name
+      ),
+    });
   }
 
   let timeout: NodeJS.Timeout | undefined;
@@ -128,15 +150,29 @@ export const useGamesStore = defineStore('games', () => {
     games.value.push(customGame);
   };
 
+  function removeGame(gameId: string) {
+    games.value = games.value.filter((game) => game.id !== gameId);
+    recentGamesIds.value = recentGamesIds.value.filter((id) => id !== gameId);
+    const favsCountBefore = favGamesIds.value.length;
+    favGamesIds.value = favGamesIds.value.filter((id) => id !== gameId);
+    const favsCountAfter = favGamesIds.value.length;
+    if (favsCountBefore !== favsCountAfter) return updateFavorites();
+    return;
+  }
+
   return {
     games,
+    recentGamesIds,
     recentGames,
+    favGamesIds,
     favoriteGames,
     addRecent,
     toggleFavorite,
+    updateFavorites,
     launchGame,
     cancelLaunch,
     addCustomGame,
+    removeGame,
   };
 });
 
@@ -344,5 +380,31 @@ export const useAuthStore = defineStore('authStore', () => {
 
   const updateAccount = (userInfo: UserUpdateInfo) => updateCurrentUserProfile(userInfo);
 
-  return { auth, user, isUserLoaded, signIn, signOut, createAccount, updateAccount };
+  const checkCurrentPassword = async (password: string) => {
+    if (!user.value || !user.value.email) return false;
+    const credential = EmailAuthProvider.credential(user.value.email, password);
+    try {
+      await reauthenticateWithCredential(user.value, credential);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  const changePassword = (password: string) => {
+    if (!user.value) return Promise.reject();
+    return updatePassword(user.value, password);
+  };
+
+  return {
+    auth,
+    user,
+    isUserLoaded,
+    signIn,
+    signOut,
+    createAccount,
+    updateAccount,
+    checkCurrentPassword,
+    changePassword,
+  };
 });

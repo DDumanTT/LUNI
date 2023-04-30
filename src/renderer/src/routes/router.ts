@@ -1,6 +1,5 @@
 import { createMemoryHistory, createRouter } from 'vue-router';
 
-import MainLayout from './MainLayout.vue';
 import HomePage from './HomePage.vue';
 import GamesPage from './GamesPage.vue';
 import FriendsPage from './FriendsPage.vue';
@@ -12,7 +11,6 @@ const router = createRouter({
     {
       path: '/',
       redirect: { path: '/home' },
-      component: MainLayout,
       children: [
         { path: 'home', component: HomePage },
         { path: 'games', component: GamesPage },

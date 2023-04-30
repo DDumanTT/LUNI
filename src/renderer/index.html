@@ -5,8 +5,10 @@
     <title>LUNI</title>
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self' appdata://* data: https://*.googleapis.com https://www.googletagmanager.com https://*.google-analytics.com https://*.cloudfunctions.net http://127.0.0.1:5001 https://*.igdb.com; style-src 'self' 'unsafe-inline'"
+      content="default-src 'self' appdata://* data: https://*.googleapis.com https://www.googletagmanager.com https://*.google-analytics.com https://*.cloudfunctions.net http://127.0.0.1:5001 http://localhost:* https://*.igdb.com; style-src 'self' 'unsafe-inline'"
     />
+    <link rel="stylesheet" href="./src/assets/css/styles.css" />
+    <link id="theme-link" rel="stylesheet" href="./src/assets/themes/viva-dark/theme.css" />
   </head>
   <body>
     <div id="app"></div>

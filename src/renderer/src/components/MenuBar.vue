@@ -10,10 +10,6 @@
             outlined
             @click="signInVisible = true"
           />
-          <SignInModal v-model:visible="signInVisible" @close="signInVisible = false" />
-          <!-- <Dialog v-model:visible="editProfileVisible" header="Edit profile">
-            <ProfileEditForm />
-          </Dialog> -->
         </template>
         <template v-else>
           <Avatar
@@ -31,7 +27,7 @@
       <TabMenu :model="items" />
     </div>
     <div class="settings">
-      <Button class="mr-1" icon="pi pi-cog" plain text rounded />
+      <Button class="mr-1" icon="pi pi-cog" plain text rounded @click="settingsVisible = true" />
     </div>
     <Menu ref="menu" :model="menuItems" :popup="true">
       <template #item="slotProps">
@@ -47,31 +43,39 @@
         </a>
       </template>
     </Menu>
+    <SignInModal v-model:visible="signInVisible" @close="signInVisible = false" />
+    <ProfileEditModal v-model:visible="editProfileVisible" @close="editProfileVisible = false" />
     <AlertsModal v-model:visible="alertsVisible" />
+    <SettingsModal v-model:visible="settingsVisible" />
   </nav>
 </template>
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+import { useLocalStorage } from '@vueuse/core';
 import TabMenu from 'primevue/tabmenu';
 import { MenuItem } from 'primevue/menuitem';
 import Button from 'primevue/button';
 import Avatar from 'primevue/avatar';
 import Badge from 'primevue/badge';
+import Menu from 'primevue/menu';
 
 import SignInModal from './SignInModal.vue';
+import ProfileEditModal from './ProfileEditModal.vue';
+import SettingsModal from './SettingsModal.vue';
+import AlertsModal from './AlertsModal.vue';
 import { useAuthStore, useFriendsStore } from '@renderer/store';
 import { randomColor } from '@renderer/utils';
-import Menu from 'primevue/menu';
-import AlertsModal from './AlertsModal.vue';
 
 const authStore = useAuthStore();
 const friendsStore = useFriendsStore();
+const theme = useLocalStorage('theme', 'dark');
 
 const menu = ref();
 const signInVisible = ref(false);
-// const editProfileVisible = ref(false);
+const editProfileVisible = ref(false);
 const alertsVisible = ref(false);
+const settingsVisible = ref(false);
 const items = computed<MenuItem[]>(() => [
   {
     label: 'Home',
@@ -102,7 +106,7 @@ const menuItems = computed(() => [
   {
     label: 'Edit profile',
     icon: 'pi pi-user-edit',
-    command: () => {},
+    command: () => (editProfileVisible.value = true),
   },
   { separator: true },
   {
@@ -117,6 +121,7 @@ const toggleMenu = (event) => menu.value.toggle(event);
 
 <style scoped lang="postcss">
 .nav-wrapper {
+  color: var(--surface-700);
   --font-size: 1.125rem;
   position: sticky;
   top: 0px;
@@ -125,7 +130,7 @@ const toggleMenu = (event) => menu.value.toggle(event);
   align-items: center;
   justify-content: center;
   border-bottom: 1px solid black;
-  background: rgb(0 0 0 / 0.6);
+  background: v-bind('theme === "dark" ? "rgb(0 0 0 / 0.6)" : "rgb(255 255 255 / 0.6)"');
   backdrop-filter: blur(10px);
   font-size: var(--font-size);
 }
@@ -133,6 +138,9 @@ const toggleMenu = (event) => menu.value.toggle(event);
   display: flex;
   flex: 1;
   justify-content: flex-end;
+  :deep(.pi-button-icon) {
+    color: var(--surface-700);
+  }
 }
 .nav-tabs {
   height: 100%;
@@ -143,8 +151,11 @@ const toggleMenu = (event) => menu.value.toggle(event);
 :deep(.p-tabmenu) {
   font-size: var(--font-size);
 }
-:deep(.p-tabmenu .p-tabmenu-nav .p-tabmenuitem .p-menuitem-link) {
+:deep(.p-tabmenu-nav) {
   background: transparent;
+}
+:deep(.p-menuitem-link) {
+  background: transparent !important;
 }
 .avatar {
   background-color: v-bind('`var(${avatarColor})`');

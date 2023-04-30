@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import {Apicalypse} from "apicalypse";
@@ -15,6 +16,11 @@ interface AuthResp {
 interface GameInfoRequest {
   game: string;
   fields: string[]
+}
+
+interface User {
+  uid: string;
+  favoriteGames?: string[];
 }
 
 /**
@@ -74,7 +80,20 @@ export const getGameData = functions.region("europe-west1")
         Object.keys(b).length - Object.keys(a).length)[0];
   });
 
-export const onUserCreated = functions.auth.user().onCreate((user) => {
+export const getRecommendedFriends = functions.region("europe-west1")
+  .https.onCall(async (_, context) => {
+    const users = await admin.firestore().collection("users").get();
+    const caller = users.docs.find((user) => user.id === context.auth?.uid)?.data() as User;
+    const recommendedUsers = [] as User[];
+    users.forEach((doc) => {
+      const user = doc.data() as User;
+      const commonGames = user.favoriteGames?.filter((game) => caller.favoriteGames?.includes(game));
+      if (commonGames && commonGames.length >= 5) recommendedUsers.push(user);
+    });
+    return recommendedUsers;
+  });
+
+export const onUserCreated = functions.region("europe-west1").auth.user().onCreate((user) => {
   const {uid, email, displayName} = user;
   return admin.firestore().collection("users").doc(uid).set({
     email,

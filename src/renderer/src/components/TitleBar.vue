@@ -30,7 +30,9 @@ function handleClick(command: 'min' | 'max' | 'close'): void {
 .logo {
   margin-left: 0.125rem;
   font-family: PressStart2P, sans-serif;
-  color: var(--indigo-600);
+  color: transparent;
+  background-image: linear-gradient(to right, var(--indigo-500), var(--red-500));
+  background-clip: text;
 }
 .window-controls {
   -webkit-app-region: no-drag;
