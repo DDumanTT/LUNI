@@ -4,7 +4,7 @@
     modal
     :breakpoints="{ '1536px': '60%', '1024px': '80%', '860px': '100%' }"
     class="h-[80vh] w-1/2 overflow-hidden"
-    content-class="min-h-[24rem]"
+    content-class="min-h-[24rem] h-full"
     dismissable-mask
     append-to="#main"
   >

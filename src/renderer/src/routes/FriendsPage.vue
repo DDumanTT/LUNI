@@ -1,6 +1,6 @@
 <template>
   <template v-if="currentUser">
-    <DataView :value="recommendedUsers" layout="grid" data-key="recommended-users">
+    <DataView :value="filteredRecommended" layout="grid" data-key="recommended-users">
       <template #header>
         <div class="header">
           <h2 class="title">Recommended users</h2>
@@ -123,6 +123,15 @@ const filteredFriends = computed(() =>
         friend.email!.toLowerCase().includes(friendSearch.value.toLowerCase())
     )
     .map((friend) => ({ ...friend, isFriend: true }))
+);
+
+const filteredRecommended = computed(() =>
+  recommendedUsers.value.filter(
+    (user) =>
+      recommendedSearch.value === '' ||
+      user.displayName?.toLowerCase().includes(recommendedSearch.value.toLowerCase()) ||
+      user.email!.toLowerCase().includes(recommendedSearch.value.toLowerCase())
+  )
 );
 
 const getRecommended = async () => {
