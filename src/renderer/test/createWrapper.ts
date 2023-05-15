@@ -1,11 +1,7 @@
 import { vi } from 'vitest';
 import { mount } from '@vue/test-utils';
 import { createTestingPinia } from '@pinia/testing';
-import { useLocalStorage } from '@vueuse/core';
-
-// vi.mock('../src/store.ts', () => ({
-
-// }));
+import PrimeVue from 'primevue/config';
 
 const createWrapper = (component) => {
   return mount(component, {
@@ -16,6 +12,7 @@ const createWrapper = (component) => {
           fakeApp: true,
         }),
       ],
+      mocks: [PrimeVue],
     },
   });
 };

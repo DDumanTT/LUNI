@@ -1,13 +1,13 @@
-import { beforeEach, describe, it } from 'vitest';
-import { mount, shallowMount } from '@vue/test-utils';
-import createWrapper from './createWrapper';
+import { describe, it, vi } from 'vitest';
+import { mount } from '@vue/test-utils';
 import App from '../src/App.vue';
 import { useLocalStorage } from '@vueuse/core';
 
-describe.skip('Component', () => {
+describe('Component', () => {
   it('renders the TitleBar component', () => {
     const wrapper = mount(App);
-    wrapper.vm.authStore = { isUserLoaded: true };
+    const authStore = vi.fn().mockReturnValue();
+    authStore.isUserLoaded = true;
     expect(wrapper.findComponent({ name: 'TitleBar' })).toBeTruthy();
   });
 

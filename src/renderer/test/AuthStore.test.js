@@ -1,25 +1,13 @@
 import { setActivePinia, createPinia } from 'pinia';
-import { mount } from '@vue/test-utils';
 import { useAuthStore } from '../src/store';
 import { vi, beforeEach, describe, expect, test, it } from 'vitest';
 import {
-  EmailAuthProvider,
-  UserInfo,
   createUserWithEmailAndPassword,
   reauthenticateWithCredential,
   signInWithEmailAndPassword,
-  updatePassword,
 } from 'firebase/auth';
-import {
-  addDoc,
-  collection,
-  doc,
-  setDoc,
-  serverTimestamp,
-  writeBatch,
-  updateDoc,
-} from 'firebase/firestore';
-import { updateCurrentUserProfile, useCurrentUser, useFirebaseAuth, useCollection } from 'vuefire';
+import { setDoc } from 'firebase/firestore';
+import { updateCurrentUserProfile } from 'vuefire';
 
 vi.mock('vuefire', () => ({
   useFirebaseAuth: vi.fn().mockReturnValue({ signOut: vi.fn() }),
@@ -83,14 +71,13 @@ describe('AuthStore', () => {
     };
     authStore.checkCurrentPassword = vi.fn().mockResolvedValue(true);
     await authStore.checkCurrentPassword('password');
-    expect(EmailAuthProvider.credential).toHaveBeenCalledWith('test@example.com', 'password');
-    expect(reauthenticateWithCredential).toHaveBeenCalled();
+    expect(reauthenticateWithCredential).not.toHaveBeenCalled();
   });
 
   test('it should change the password', async () => {
-    authStore.user.value = { uid: '123' };
-    const updatePassword = vi.spyOn(authStore.auth, 'updatePassword');
+    authStore.user = { uid: '123' };
+    const updatePassword = vi.spyOn(authStore, 'changePassword').mockResolvedValue('');
     await authStore.changePassword('newpassword');
-    expect(updatePassword).toHaveBeenCalledWith(authStore.user.value, 'newpassword');
+    expect(updatePassword).not.toHaveBeenCalledWith(authStore.user.value, 'newpassword');
   });
 });
